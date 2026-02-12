@@ -13,7 +13,7 @@ export default function Header({ step, onReset }) {
         </div>
         <div>
           <h1 className="text-[17px] font-bold text-snap-text tracking-tight leading-tight">
-            SnapSheet
+            Rohan
           </h1>
           <p className="text-[11px] text-snap-text-muted leading-tight">
             Image → Excel in seconds

@@ -1,4 +1,4 @@
-const CACHE_NAME = "snapsheet-v1";
+const CACHE_NAME = "rohan-v1";
 const STATIC_ASSETS = ["/", "/history", "/login", "/signup"];
 
 // Install: cache the app shell
@@ -30,8 +30,8 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Never cache API routes or Supabase calls
-  if (url.pathname.startsWith("/api/") || url.hostname.includes("supabase")) {
+  // Never cache API routes or Firebase calls
+  if (url.pathname.startsWith("/api/") || url.hostname.includes("firebase")) {
     return;
   }
 

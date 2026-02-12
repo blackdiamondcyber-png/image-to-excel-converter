@@ -71,5 +71,5 @@ export function downloadExcel(tables, filename) {
     .replace(/[:-]/g, "")
     .replace("T", "_");
 
-  XLSX.writeFile(wb, filename || `SnapSheet_Export_${ts}.xlsx`);
+  XLSX.writeFile(wb, filename || `Rohan_Export_${ts}.xlsx`);
 }

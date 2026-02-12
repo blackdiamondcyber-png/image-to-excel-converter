@@ -1,7 +1,7 @@
 import AuthForm from "@/components/AuthForm";
 
 export const metadata = {
-  title: "Sign Up — SnapSheet",
+  title: "Sign Up — Rohan",
 };
 
 export default function SignupPage() {

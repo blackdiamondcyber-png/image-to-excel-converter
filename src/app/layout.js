@@ -3,7 +3,7 @@ import { ToastProvider } from "@/components/Toast";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 
 export const metadata = {
-  title: "SnapSheet — Image to Excel",
+  title: "Rohan — Image to Excel",
   description:
     "Photograph documents and convert them to Excel using Claude Vision AI",
   manifest: "/manifest.json",

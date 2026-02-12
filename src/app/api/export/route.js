@@ -19,7 +19,7 @@ export async function POST(request) {
       .slice(0, 16)
       .replace(/[:-]/g, "")
       .replace("T", "_");
-    const filename = `SnapSheet_Export_${timestamp}.xlsx`;
+    const filename = `Rohan_Export_${timestamp}.xlsx`;
 
     return new Response(buffer, {
       headers: {

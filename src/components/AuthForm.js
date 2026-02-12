@@ -45,7 +45,7 @@ export default function AuthForm({ mode = "login" }) {
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-snap-accent to-purple-600 flex items-center justify-center text-2xl mx-auto mb-4">
             📊
           </div>
-          <h1 className="text-2xl font-bold text-snap-text">SnapSheet</h1>
+          <h1 className="text-2xl font-bold text-snap-text">Rohan</h1>
           <p className="text-snap-text-muted text-sm mt-1">
             {isSignUp ? "Create your account" : "Sign in to your account"}
           </p>
