@@ -31,7 +31,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={toast}>
       {children}
-      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 w-[90%] max-w-[400px] pointer-events-none">
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-2 w-[90%] max-w-[400px] pointer-events-none">
         {toasts.map((t) => (
           <ToastItem key={t.id} toast={t} />
         ))}
@@ -63,7 +63,7 @@ function ToastItem({ toast }) {
 
   return (
     <div
-      className={`pointer-events-auto border rounded-xl px-4 py-3 text-xs font-medium flex items-center gap-2 transition-all duration-300 ${styles[toast.type] || styles.info} ${visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}
+      className={`pointer-events-auto border rounded-xl px-4 py-3 text-xs font-medium flex items-center gap-2 transition-all duration-300 ${styles[toast.type] || styles.info} ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
     >
       <span className="text-sm">{icons[toast.type]}</span>
       {toast.message}
