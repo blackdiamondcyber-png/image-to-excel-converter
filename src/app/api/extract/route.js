@@ -25,6 +25,12 @@ async function getUserId(request) {
 export async function POST(request) {
   try {
     // Authenticate
+    if (!adminAuth) {
+      return NextResponse.json(
+        { error: "Server authentication is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY." },
+        { status: 500 }
+      );
+    }
     const userId = await getUserId(request);
     if (!userId) {
       return NextResponse.json(
