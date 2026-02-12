@@ -57,7 +57,7 @@ export default function SnapSheetApp() {
   const handleExport = useCallback(async () => {
     setStep("export");
 
-    // Save to Supabase if user is logged in and not already saved
+    // Save to Firestore if user is logged in and not already saved
     if (user && !scanSaved && tables.length > 0) {
       try {
         const totalRows = tables.reduce((sum, t) => sum + t.rows.length, 0);

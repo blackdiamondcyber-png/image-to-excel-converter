@@ -1,31 +1,43 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getSupabaseBrowser } from "@/lib/supabase-browser";
+import { db } from "@/lib/firebase";
+import { auth } from "@/lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 /**
- * Hook for managing saved scans in Supabase.
- * Gracefully returns empty state if Supabase is not configured.
+ * Hook for managing saved scans in Firestore.
+ * Gracefully returns empty state if Firebase is not configured.
  */
 export function useScans() {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchScans = useCallback(async () => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) {
+    if (!db || !auth?.currentUser) {
       setLoading(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase
-        .from("scans")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setScans(data || []);
+      const q = query(
+        collection(db, "scans"),
+        where("user_id", "==", auth.currentUser.uid),
+        orderBy("created_at", "desc")
+      );
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setScans(data);
     } catch (err) {
       console.error("Error fetching scans:", err);
     } finally {
@@ -38,26 +50,23 @@ export function useScans() {
   }, [fetchScans]);
 
   const saveScan = useCallback(async (scanData) => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) return null;
+    if (!db) return null;
 
-    const { data, error } = await supabase
-      .from("scans")
-      .insert(scanData)
-      .select()
-      .single();
+    const docRef = await addDoc(collection(db, "scans"), {
+      ...scanData,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp(),
+    });
 
-    if (error) throw error;
-    setScans((prev) => [data, ...prev]);
-    return data;
+    const saved = { id: docRef.id, ...scanData, created_at: new Date().toISOString() };
+    setScans((prev) => [saved, ...prev]);
+    return saved;
   }, []);
 
   const deleteScan = useCallback(async (id) => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) return;
+    if (!db) return;
 
-    const { error } = await supabase.from("scans").delete().eq("id", id);
-    if (error) throw error;
+    await deleteDoc(doc(db, "scans", id));
     setScans((prev) => prev.filter((s) => s.id !== id));
   }, []);
 

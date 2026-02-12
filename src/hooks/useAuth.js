@@ -1,53 +1,71 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getSupabaseBrowser } from "@/lib/supabase-browser";
+import { auth } from "@/lib/firebase";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  updateProfile,
+} from "firebase/auth";
 
 /**
  * Auth hook — returns current user and auth helpers.
- * Gracefully handles missing Supabase config (app works without auth).
+ * Gracefully handles missing Firebase config (app works without auth).
  */
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) {
+    if (!auth) {
       setLoading(false);
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          id: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+        });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   const signIn = async (email, password) => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) throw new Error("Supabase not configured");
-    return supabase.auth.signInWithPassword({ email, password });
+    if (!auth) throw new Error("Firebase not configured");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      return { error: null };
+    } catch (err) {
+      return { error: err };
+    }
   };
 
-  const signUp = async (email, password) => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) throw new Error("Supabase not configured");
-    return supabase.auth.signUp({ email, password });
+  const signUp = async (email, password, displayName) => {
+    if (!auth) throw new Error("Firebase not configured");
+    try {
+      const { user: newUser } = await createUserWithEmailAndPassword(auth, email, password);
+      if (displayName) {
+        await updateProfile(newUser, { displayName });
+      }
+      return { error: null };
+    } catch (err) {
+      return { error: err };
+    }
   };
 
   const signOut = async () => {
-    const supabase = getSupabaseBrowser();
-    if (!supabase) return;
-    return supabase.auth.signOut();
+    if (!auth) return;
+    return firebaseSignOut(auth);
   };
 
   return { user, loading, signIn, signUp, signOut };

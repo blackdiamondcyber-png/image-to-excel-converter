@@ -1,32 +1,27 @@
-import { getSupabaseBrowser } from "./supabase-browser";
+import { storage } from "./firebase";
+import { ref, uploadBytes, deleteObject, getDownloadURL } from "firebase/storage";
 
 /**
- * Upload a file to Supabase Storage under the user's folder.
- * Returns the storage path or null if Supabase isn't configured.
+ * Upload a file to Firebase Storage under the user's folder.
+ * Returns the storage path or null if Firebase isn't configured.
  */
 export async function uploadFile(userId, folder, fileName, fileData, contentType) {
-  const supabase = getSupabaseBrowser();
-  if (!supabase || !userId) return null;
+  if (!storage || !userId) return null;
 
   const path = `${userId}/${folder}/${Date.now()}_${fileName}`;
+  const storageRef = ref(storage, path);
 
-  const { error } = await supabase.storage
-    .from("snapsheet")
-    .upload(path, fileData, {
-      contentType,
-      upsert: false,
-    });
-
-  if (error) {
+  try {
+    await uploadBytes(storageRef, fileData, { contentType });
+    return path;
+  } catch (error) {
     console.error("Storage upload error:", error);
     return null;
   }
-
-  return path;
 }
 
 /**
- * Upload a base64 image to Supabase Storage.
+ * Upload a base64 image to Firebase Storage.
  */
 export async function uploadBase64Image(userId, fileName, base64Data, mediaType) {
   const byteChars = atob(base64Data);
@@ -39,36 +34,30 @@ export async function uploadBase64Image(userId, fileName, base64Data, mediaType)
 }
 
 /**
- * Delete a file from Supabase Storage.
+ * Delete a file from Firebase Storage.
  */
 export async function deleteFile(path) {
-  const supabase = getSupabaseBrowser();
-  if (!supabase || !path) return;
+  if (!storage || !path) return;
 
-  const { error } = await supabase.storage
-    .from("snapsheet")
-    .remove([path]);
-
-  if (error) {
+  try {
+    const storageRef = ref(storage, path);
+    await deleteObject(storageRef);
+  } catch (error) {
     console.error("Storage delete error:", error);
   }
 }
 
 /**
- * Get a public (signed) URL for a storage file.
+ * Get a download URL for a storage file.
  */
-export async function getSignedUrl(path, expiresIn = 3600) {
-  const supabase = getSupabaseBrowser();
-  if (!supabase || !path) return null;
+export async function getFileUrl(path) {
+  if (!storage || !path) return null;
 
-  const { data, error } = await supabase.storage
-    .from("snapsheet")
-    .createSignedUrl(path, expiresIn);
-
-  if (error) {
-    console.error("Signed URL error:", error);
+  try {
+    const storageRef = ref(storage, path);
+    return await getDownloadURL(storageRef);
+  } catch (error) {
+    console.error("Download URL error:", error);
     return null;
   }
-
-  return data.signedUrl;
 }
