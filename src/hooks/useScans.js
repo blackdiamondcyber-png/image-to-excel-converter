@@ -1,73 +1,78 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { db } from "@/lib/firebase";
-import { auth } from "@/lib/firebase";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  getDocs,
-  addDoc,
-  deleteDoc,
-  doc,
-  serverTimestamp,
-} from "firebase/firestore";
+
+const STORAGE_KEY = "rohan_scans";
 
 /**
- * Hook for managing saved scans in Firestore.
- * Gracefully returns empty state if Firebase is not configured.
+ * Read scans from localStorage.
+ */
+function readFromStorage() {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Write scans to localStorage.
+ */
+function writeToStorage(scans) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(scans));
+  } catch (err) {
+    // localStorage full — remove oldest scans until it fits
+    if (err.name === "QuotaExceededError" && scans.length > 1) {
+      writeToStorage(scans.slice(0, -1));
+    }
+  }
+}
+
+/**
+ * Hook for managing saved scans in localStorage.
+ * All data stays on the user's device — no cloud storage needed.
  */
 export function useScans() {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchScans = useCallback(async () => {
-    if (!db || !auth?.currentUser) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const q = query(
-        collection(db, "scans"),
-        where("user_id", "==", auth.currentUser.uid),
-        orderBy("created_at", "desc")
-      );
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      setScans(data);
-    } catch (err) {
-      console.error("Error fetching scans:", err);
-    } finally {
-      setLoading(false);
-    }
+  const fetchScans = useCallback(() => {
+    const data = readFromStorage();
+    setScans(data);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     fetchScans();
   }, [fetchScans]);
 
-  const saveScan = useCallback(async (scanData) => {
-    if (!db) return null;
-
-    const docRef = await addDoc(collection(db, "scans"), {
+  const saveScan = useCallback((scanData) => {
+    const id = `scan_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const saved = {
+      id,
       ...scanData,
-      created_at: serverTimestamp(),
-      updated_at: serverTimestamp(),
+      created_at: new Date().toISOString(),
+    };
+
+    setScans((prev) => {
+      const updated = [saved, ...prev];
+      writeToStorage(updated);
+      return updated;
     });
 
-    const saved = { id: docRef.id, ...scanData, created_at: new Date().toISOString() };
-    setScans((prev) => [saved, ...prev]);
     return saved;
   }, []);
 
-  const deleteScan = useCallback(async (id) => {
-    if (!db) return;
-
-    await deleteDoc(doc(db, "scans", id));
-    setScans((prev) => prev.filter((s) => s.id !== id));
+  const deleteScan = useCallback((id) => {
+    setScans((prev) => {
+      const updated = prev.filter((s) => s.id !== id);
+      writeToStorage(updated);
+      return updated;
+    });
   }, []);
 
   return { scans, loading, fetchScans, saveScan, deleteScan };

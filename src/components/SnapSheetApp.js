@@ -55,15 +55,14 @@ export default function SnapSheetApp() {
     }
   }, [images, processImages, toast]);
 
-  const handleExport = useCallback(async () => {
+  const handleExport = useCallback(() => {
     setStep("export");
 
-    // Save to Firestore if user is logged in and not already saved
-    if (user && !scanSaved && tables.length > 0) {
+    // Save scan locally on device
+    if (!scanSaved && tables.length > 0) {
       try {
         const totalRows = tables.reduce((sum, t) => sum + t.rows.length, 0);
-        await saveScan({
-          user_id: user.id,
+        saveScan({
           title: `Scan — ${new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`,
           image_count: images.length,
           table_count: tables.length,
@@ -78,7 +77,7 @@ export default function SnapSheetApp() {
         toast.warning("Scan exported but could not save to history");
       }
     }
-  }, [user, scanSaved, tables, images.length, saveScan, toast]);
+  }, [scanSaved, tables, images.length, saveScan, toast]);
 
   // Redirect to login if not authenticated
   if (!authLoading && !user) {
