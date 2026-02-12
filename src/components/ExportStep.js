@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import { downloadExcel } from "@/lib/excel";
+import { useToast } from "@/components/Toast";
 
 export default function ExportStep({ tables, onReset }) {
   const [downloaded, setDownloaded] = useState(false);
+  const toast = useToast();
 
   const handleDownload = () => {
     try {
       downloadExcel(tables);
       setDownloaded(true);
+      toast.success("Excel file downloaded");
     } catch (err) {
       console.error("Export error:", err);
+      toast.error("Failed to generate Excel file");
     }
   };
 
