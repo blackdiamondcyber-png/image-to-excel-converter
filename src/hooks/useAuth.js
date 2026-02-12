@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 /**
@@ -68,5 +69,15 @@ export function useAuth() {
     return firebaseSignOut(auth);
   };
 
-  return { user, loading, signIn, signUp, signOut };
+  const resetPassword = async (email) => {
+    if (!auth) throw new Error("Firebase not configured");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { error: null };
+    } catch (err) {
+      return { error: err };
+    }
+  };
+
+  return { user, loading, signIn, signUp, signOut, resetPassword };
 }

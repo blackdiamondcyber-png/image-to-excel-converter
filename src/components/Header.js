@@ -30,7 +30,7 @@ export default function Header({ step, onReset }) {
             ← New Scan
           </button>
         )}
-        {user ? (
+        {user && (
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-snap-accent/20 border border-snap-accent/40 flex items-center justify-center text-[11px] font-bold text-snap-accent uppercase">
               {user.email?.[0] || "U"}
@@ -43,15 +43,6 @@ export default function Header({ step, onReset }) {
               Sign out
             </button>
           </div>
-        ) : (
-          step === "capture" && (
-            <a
-              href="/login"
-              className="bg-snap-surface border border-snap-border text-snap-text-muted px-3.5 py-2 rounded-lg text-xs cursor-pointer hover:border-snap-border-focus transition-colors no-underline"
-            >
-              Sign in
-            </a>
-          )
         )}
       </div>
     </header>

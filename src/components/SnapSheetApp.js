@@ -18,7 +18,7 @@ export default function SnapSheetApp() {
   const [images, setImages] = useState([]);
   const [scanSaved, setScanSaved] = useState(false);
 
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { saveScan } = useScans();
   const toast = useToast();
 
@@ -33,15 +33,15 @@ export default function SnapSheetApp() {
     reset: resetScan,
   } = useScan();
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     images.forEach((img) => URL.revokeObjectURL(img.preview));
     setImages([]);
     resetScan();
     setScanSaved(false);
     setStep("capture");
-  };
+  }, [images, resetScan]);
 
-  const handleProcess = async () => {
+  const handleProcess = useCallback(async () => {
     setStep("processing");
     const extracted = await processImages(images);
     if (extracted.length > 0) {
@@ -52,7 +52,7 @@ export default function SnapSheetApp() {
         );
       }, 600);
     }
-  };
+  }, [images, processImages, toast]);
 
   const handleExport = useCallback(async () => {
     setStep("export");
@@ -78,6 +78,26 @@ export default function SnapSheetApp() {
       }
     }
   }, [user, scanSaved, tables, images.length, saveScan, toast]);
+
+  // Redirect to login if not authenticated
+  if (!authLoading && !user) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    return null;
+  }
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="bg-snap-bg min-h-screen max-w-[480px] mx-auto font-sans flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">📊</div>
+          <p className="text-snap-text-muted text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-snap-bg min-h-screen max-w-[480px] mx-auto font-sans flex flex-col relative pb-16">
