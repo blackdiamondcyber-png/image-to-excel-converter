@@ -1,5 +1,5 @@
-const CACHE_NAME = "rohan-v1";
-const STATIC_ASSETS = ["/", "/history", "/login", "/signup"];
+const CACHE_NAME = "rohan-v2";
+const STATIC_ASSETS = ["/", "/history", "/login", "/signup", "/offline.html"];
 
 // Install: cache the app shell
 self.addEventListener("install", (event) => {
@@ -35,7 +35,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Network-first for navigation (HTML pages)
+  // Network-first for navigation (HTML pages), offline fallback
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -44,7 +44,9 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           return response;
         })
-        .catch(() => caches.match(request))
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match("/offline.html"))
+        )
     );
     return;
   }
