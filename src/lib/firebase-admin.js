@@ -10,13 +10,24 @@ function getAdminApp() {
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
   if (!projectId || !clientEmail || !privateKey) {
-    console.warn("Firebase Admin env vars not set — server DB features disabled");
+    console.warn(
+      "Firebase Admin env vars not set — server DB features disabled.",
+      "Missing:",
+      !projectId && "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+      !clientEmail && "FIREBASE_CLIENT_EMAIL",
+      !privateKey && "FIREBASE_PRIVATE_KEY"
+    );
     return null;
   }
 
-  return initializeApp({
-    credential: cert({ projectId, clientEmail, privateKey }),
-  });
+  try {
+    return initializeApp({
+      credential: cert({ projectId, clientEmail, privateKey }),
+    });
+  } catch (err) {
+    console.error("Firebase Admin init failed:", err.message);
+    return null;
+  }
 }
 
 const adminApp = getAdminApp();
