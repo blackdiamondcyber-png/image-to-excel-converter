@@ -23,6 +23,14 @@ export default function HistoryPage() {
   const [viewMode, setViewMode] = useState(null); // "review" | "export"
   const [viewTables, setViewTables] = useState([]);
 
+  // Redirect to login if not authenticated
+  if (!authLoading && !user) {
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    return null;
+  }
+
   const handleView = (scan) => {
     if (!scan.tables_json || scan.tables_json.length === 0) {
       toast.warning("No table data found in this scan");

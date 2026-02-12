@@ -2,7 +2,7 @@
 
 import { useRef, useCallback } from "react";
 
-const MAX_IMAGES = 20;
+const MAX_IMAGES = 5;
 
 export default function CaptureStep({ images, setImages, onProcess }) {
   const fileInputRef = useRef(null);
