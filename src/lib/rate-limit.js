@@ -3,15 +3,15 @@
  * Tracks extraction counts per user per day and globally.
  *
  * Limits:
- * - 10 extractions per user per day
- * - 200 total extractions per day (across all users)
+ * - 50 extractions per user per day (one full 40-page scan + headroom)
+ * - 500 total extractions per day (across all users)
  *
  * Note: In-memory state resets on cold starts, so actual usage may
  * slightly exceed limits. For 50 users this is more than adequate.
  */
 
-const PER_USER_DAILY_LIMIT = 10;
-const GLOBAL_DAILY_LIMIT = 200;
+const PER_USER_DAILY_LIMIT = 50;
+const GLOBAL_DAILY_LIMIT = 500;
 
 // { date: "2025-01-15", users: { "uid123": 5 }, total: 42 }
 let store = { date: "", users: {}, total: 0 };
