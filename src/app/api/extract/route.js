@@ -1,44 +1,71 @@
 import { NextResponse } from "next/server";
 import { extractTablesFromImage } from "@/lib/claude";
 import { checkRateLimit, recordExtraction } from "@/lib/rate-limit";
-import { getAdminAuth, getInitError } from "@/lib/firebase-admin";
+import { getAdminAuth } from "@/lib/firebase-admin";
+
+/**
+ * Fallback: verify a Firebase ID token using the public REST API.
+ * Only requires the public FIREBASE_API_KEY — no admin credentials needed.
+ */
+async function verifyTokenViaRest(idToken) {
+  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const res = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.users?.[0]?.localId || null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Verify the Firebase ID token from the Authorization header.
+ * Tries Admin SDK first, falls back to REST API verification.
  * Returns { uid } on success, or { error, status } on failure.
  */
 async function authenticateRequest(request) {
-  const auth = getAdminAuth();
-  if (!auth) {
-    const initError = getInitError();
-    return {
-      error: initError
-        ? `Server auth failed to initialize: ${initError}`
-        : "Server authentication is not configured. Set FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY.",
-      status: 500,
-    };
-  }
-
   const authHeader = request.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return { error: "Missing authorization header. Please sign in.", status: 401 };
   }
 
-  try {
-    const token = authHeader.split("Bearer ")[1];
-    const decoded = await auth.verifyIdToken(token);
-    return { uid: decoded.uid };
-  } catch (err) {
-    console.error("Token verification failed:", err.code || err.message);
-    // Return specific message based on the Firebase error
-    if (err.code === "auth/id-token-expired") {
-      return { error: "Your session has expired. Please sign in again.", status: 401 };
+  const token = authHeader.split("Bearer ")[1];
+
+  // Strategy 1: Firebase Admin SDK (fastest, offline-capable)
+  const auth = getAdminAuth();
+  if (auth) {
+    try {
+      const decoded = await auth.verifyIdToken(token);
+      return { uid: decoded.uid };
+    } catch (err) {
+      console.error("Admin token verification failed:", err.code || err.message);
+      if (err.code === "auth/id-token-expired") {
+        return { error: "Your session has expired. Please sign in again.", status: 401 };
+      }
+      if (err.code === "auth/id-token-revoked") {
+        return { error: "Invalid session. Please sign out and sign in again.", status: 401 };
+      }
+      // For other admin errors, fall through to REST fallback
     }
-    if (err.code === "auth/argument-error" || err.code === "auth/id-token-revoked") {
-      return { error: "Invalid session. Please sign out and sign in again.", status: 401 };
-    }
-    return { error: "Authentication failed. Please sign in again.", status: 401 };
   }
+
+  // Strategy 2: Firebase REST API (no admin credentials needed)
+  const uid = await verifyTokenViaRest(token);
+  if (uid) {
+    return { uid };
+  }
+
+  return { error: "Authentication failed. Please sign in again.", status: 401 };
 }
 
 export async function POST(request) {
