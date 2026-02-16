@@ -46,7 +46,12 @@ function compressImage(file) {
         });
       reader.readAsDataURL(file);
     };
-    img.src = URL.createObjectURL(file);
+    const objectUrl = URL.createObjectURL(file);
+    img.src = objectUrl;
+    // Clean up blob URL after image loads or fails
+    const cleanup = () => URL.revokeObjectURL(objectUrl);
+    img.addEventListener("load", cleanup, { once: true });
+    img.addEventListener("error", cleanup, { once: true });
   });
 }
 

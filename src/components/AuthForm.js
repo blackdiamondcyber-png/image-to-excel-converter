@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthForm({ mode = "login" }) {
+  const router = useRouter();
   const { signIn, signUp, resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,11 +28,11 @@ export default function AuthForm({ mode = "login" }) {
         const { error: err } = await signUp(email, password, name || undefined);
         if (err) throw err;
         // Firebase auto-signs in after signup — redirect to app
-        window.location.href = "/";
+        router.replace("/");
       } else {
         const { error: err } = await signIn(email, password);
         if (err) throw err;
-        window.location.href = "/";
+        router.replace("/");
       }
     } catch (err) {
       setError(err.message || "Something went wrong");

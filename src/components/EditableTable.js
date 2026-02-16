@@ -60,13 +60,13 @@ export default function EditableTable({ table, tableIndex, onUpdate }) {
         <div className="flex gap-1.5">
           <button
             onClick={addRow}
-            className="bg-snap-accent-glow border border-snap-accent text-snap-accent px-2.5 py-1 rounded-md text-[11px] cursor-pointer hover:opacity-80 transition-opacity"
+            className="bg-snap-accent-glow border border-snap-accent text-snap-accent px-3 py-1.5 rounded-md text-[11px] cursor-pointer hover:opacity-80 transition-opacity min-h-[36px]"
           >
             + Row
           </button>
           <button
             onClick={addColumn}
-            className="bg-snap-accent-glow border border-snap-accent text-snap-accent px-2.5 py-1 rounded-md text-[11px] cursor-pointer hover:opacity-80 transition-opacity"
+            className="bg-snap-accent-glow border border-snap-accent text-snap-accent px-3 py-1.5 rounded-md text-[11px] cursor-pointer hover:opacity-80 transition-opacity min-h-[36px]"
           >
             + Col
           </button>
@@ -98,7 +98,7 @@ export default function EditableTable({ table, tableIndex, onUpdate }) {
                     {headers.length > 1 && (
                       <button
                         onClick={() => deleteColumn(ci)}
-                        className="bg-transparent border-none text-snap-text-dim cursor-pointer text-[10px] px-1 py-0.5 rounded hover:text-snap-danger transition-colors"
+                        className="bg-transparent border-none text-snap-text-dim cursor-pointer text-[10px] p-2 rounded hover:text-snap-danger transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
                         title="Delete column"
                       >
                         ✕
@@ -137,7 +137,7 @@ export default function EditableTable({ table, tableIndex, onUpdate }) {
                   {rows.length > 1 && (
                     <button
                       onClick={() => deleteRow(ri)}
-                      className="bg-transparent border-none text-snap-text-dim cursor-pointer text-[11px] px-1.5 py-0.5 rounded hover:text-snap-danger transition-colors"
+                      className="bg-transparent border-none text-snap-text-dim cursor-pointer text-[11px] p-2 rounded hover:text-snap-danger transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
                       title="Delete row"
                     >
                       🗑

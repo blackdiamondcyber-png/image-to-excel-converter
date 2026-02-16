@@ -89,6 +89,15 @@ export async function POST(request) {
       );
     }
 
+    // Enforce body size limit (10MB max for base64 image + metadata)
+    const contentLength = request.headers.get("content-length");
+    if (contentLength && parseInt(contentLength) > 10 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "Request too large. Maximum image size is ~7MB." },
+        { status: 413 }
+      );
+    }
+
     const { image, mediaType } = await request.json();
 
     if (!image || !mediaType) {
@@ -98,9 +107,9 @@ export async function POST(request) {
       );
     }
 
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.CLAUDE_API_KEY) {
       return NextResponse.json(
-        { error: "ANTHROPIC_API_KEY is not configured" },
+        { error: "CLAUDE_API_KEY is not configured" },
         { status: 500 }
       );
     }
@@ -115,7 +124,7 @@ export async function POST(request) {
       remaining: limit.remaining - 1,
     });
   } catch (err) {
-    console.error("Extract API error:", err);
+    console.error("Extract API error:", err.message);
     return NextResponse.json(
       { error: err.message || "Failed to extract data from image" },
       { status: 500 }

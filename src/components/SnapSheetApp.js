@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Header from "./Header";
 import StepIndicator from "./StepIndicator";
 import CaptureStep from "./CaptureStep";
@@ -19,6 +20,7 @@ export default function SnapSheetApp() {
   const [images, setImages] = useState([]);
   const [scanSaved, setScanSaved] = useState(false);
 
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { saveScan } = useScans();
   const toast = useToast();
@@ -80,10 +82,13 @@ export default function SnapSheetApp() {
   }, [scanSaved, tables, images.length, saveScan, toast]);
 
   // Redirect to login if not authenticated
-  if (!authLoading && !user) {
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace("/login");
     }
+  }, [authLoading, user, router]);
+
+  if (!authLoading && !user) {
     return null;
   }
 

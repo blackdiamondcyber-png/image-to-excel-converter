@@ -67,7 +67,7 @@ export default function ScanCard({ scan, onView, onDelete }) {
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="py-2 px-3 rounded-lg border border-snap-border text-snap-text-dim text-[11px] cursor-pointer hover:border-snap-danger hover:text-snap-danger transition-colors disabled:opacity-40 bg-transparent"
+          className="py-2 px-3 rounded-lg border border-snap-border text-snap-text-dim text-[11px] cursor-pointer hover:border-snap-danger hover:text-snap-danger transition-colors disabled:opacity-40 bg-transparent min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           {deleting ? "..." : "🗑"}
         </button>

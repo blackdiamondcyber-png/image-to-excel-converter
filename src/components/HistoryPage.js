@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useScans } from "@/hooks/useScans";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,10 +24,13 @@ export default function HistoryPage() {
   const [viewTables, setViewTables] = useState([]);
 
   // Redirect to login if not authenticated
-  if (!authLoading && !user) {
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace("/login");
     }
+  }, [authLoading, user, router]);
+
+  if (!authLoading && !user) {
     return null;
   }
 

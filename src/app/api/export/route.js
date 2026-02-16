@@ -1,8 +1,35 @@
 import { NextResponse } from "next/server";
 import { tablesToExcelBuffer } from "@/lib/excel";
+import { getAdminAuth } from "@/lib/firebase-admin";
+
+/**
+ * Lightweight auth check — verifies the request has a valid Firebase token.
+ */
+async function isAuthenticated(request) {
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader?.startsWith("Bearer ")) return false;
+
+  const token = authHeader.split("Bearer ")[1];
+  const auth = getAdminAuth();
+  if (!auth) return false;
+
+  try {
+    await auth.verifyIdToken(token);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export async function POST(request) {
   try {
+    if (!(await isAuthenticated(request))) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+
     const { tables } = await request.json();
 
     if (!tables || !Array.isArray(tables) || tables.length === 0) {

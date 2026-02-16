@@ -21,28 +21,23 @@ export default function Header({ step, onReset }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         {step !== "capture" && (
           <button
             onClick={onReset}
-            className="bg-snap-surface border border-snap-border text-snap-text-muted px-3.5 py-2 rounded-lg text-xs cursor-pointer hover:border-snap-border-focus transition-colors"
+            className="bg-snap-surface border border-snap-border text-snap-text-muted px-2.5 py-2 rounded-lg text-xs cursor-pointer hover:border-snap-border-focus transition-colors whitespace-nowrap"
           >
-            ← New Scan
+            ← New
           </button>
         )}
         {user && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-snap-accent/20 border border-snap-accent/40 flex items-center justify-center text-[11px] font-bold text-snap-accent uppercase">
-              {user.email?.[0] || "U"}
-            </div>
-            <button
-              onClick={signOut}
-              className="text-snap-text-dim text-[11px] hover:text-snap-text-muted transition-colors cursor-pointer bg-transparent border-none p-1"
-              title="Sign out"
-            >
-              Sign out
-            </button>
-          </div>
+          <button
+            onClick={signOut}
+            className="w-8 h-8 rounded-full bg-snap-accent/20 border border-snap-accent/40 flex items-center justify-center text-[11px] font-bold text-snap-accent uppercase cursor-pointer hover:bg-snap-accent/30 transition-colors min-w-[44px] min-h-[44px]"
+            title="Sign out"
+          >
+            {user.email?.[0] || "U"}
+          </button>
         )}
       </div>
     </header>
