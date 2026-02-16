@@ -3,6 +3,9 @@ import { extractTablesFromImage } from "@/lib/claude";
 import { checkAndRecordExtraction } from "@/lib/rate-limit";
 import { getAdminAuth } from "@/lib/firebase-admin";
 
+// Extend Vercel serverless function timeout for Sonnet model responses
+export const maxDuration = 60;
+
 const ALLOWED_MEDIA_TYPES = [
   "image/jpeg",
   "image/png",
@@ -18,10 +21,7 @@ const ALLOWED_MEDIA_TYPES = [
 async function verifyTokenViaRest(idToken) {
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  if (!apiKey || !projectId) {
-    console.error("REST DEBUG: Missing env vars. API key:", !!apiKey, "Project ID:", !!projectId);
-    return null;
-  }
+  if (!apiKey || !projectId) return null;
 
   try {
     const res = await fetch(
@@ -32,17 +32,10 @@ async function verifyTokenViaRest(idToken) {
         body: JSON.stringify({ idToken }),
       }
     );
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("REST DEBUG: Google API returned", res.status, errText);
-      return null;
-    }
+    if (!res.ok) return null;
     const data = await res.json();
     const user = data.users?.[0];
-    if (!user) {
-      console.error("REST DEBUG: No user in response:", JSON.stringify(data));
-      return null;
-    }
+    if (!user) return null;
 
     // Validate token claims
     const parts = idToken.split(".");
@@ -51,22 +44,14 @@ async function verifyTokenViaRest(idToken) {
     try {
       const payload = JSON.parse(Buffer.from(parts[1], "base64").toString());
       const now = Math.floor(Date.now() / 1000);
-      if (payload.exp && payload.exp < now) {
-        console.error("REST DEBUG: Token expired. exp:", payload.exp, "now:", now);
-        return null;
-      }
-      if (payload.aud && payload.aud !== projectId) {
-        console.error("REST DEBUG: Audience mismatch. aud:", payload.aud, "expected:", projectId);
-        return null;
-      }
+      if (!payload.exp || payload.exp < now) return null;
+      if (!payload.aud || payload.aud !== projectId) return null;
     } catch {
-      // If claims can't be parsed, still allow if REST API verified the user
+      return null;
     }
 
-    console.log("REST DEBUG: Verified user:", user.localId);
     return user.localId;
-  } catch (err) {
-    console.error("REST DEBUG: Fetch error:", err.message);
+  } catch {
     return null;
   }
 }
@@ -79,7 +64,6 @@ async function verifyTokenViaRest(idToken) {
 async function authenticateRequest(request) {
   const authHeader = request.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
-    console.error("AUTH DEBUG: No Bearer header found");
     return { error: "Missing authorization header. Please sign in.", status: 401 };
   }
 
@@ -87,22 +71,16 @@ async function authenticateRequest(request) {
 
   // Reject obviously invalid tokens
   if (!token || token.length < 20 || token.length > 5000) {
-    console.error("AUTH DEBUG: Token length invalid:", token?.length);
     return { error: "Invalid token format.", status: 401 };
   }
 
-  console.log("AUTH DEBUG: Token received, length:", token.length);
-
   // Strategy 1: Firebase Admin SDK (fastest, offline-capable)
   const auth = getAdminAuth();
-  console.log("AUTH DEBUG: Admin SDK available:", !!auth);
   if (auth) {
     try {
       const decoded = await auth.verifyIdToken(token);
-      console.log("AUTH DEBUG: Admin SDK verified, uid:", decoded.uid);
       return { uid: decoded.uid };
     } catch (err) {
-      console.error("AUTH DEBUG: Admin SDK failed:", err.code, err.message);
       if (err.code === "auth/id-token-expired") {
         return { error: "Your session has expired. Please sign in again.", status: 401 };
       }
@@ -114,9 +92,7 @@ async function authenticateRequest(request) {
   }
 
   // Strategy 2: Firebase REST API (no admin credentials needed)
-  console.log("AUTH DEBUG: Trying REST fallback. API key present:", !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY, "Project ID present:", !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
   const uid = await verifyTokenViaRest(token);
-  console.log("AUTH DEBUG: REST fallback result:", uid ? "success" : "failed");
   if (uid) {
     return { uid };
   }
@@ -201,8 +177,7 @@ export async function POST(request) {
       tables,
       remaining: limit.remaining,
     });
-  } catch (err) {
-    console.error("Extract API error:", err.message);
+  } catch {
     return NextResponse.json(
       { error: "Failed to extract data from image. Please try again." },
       { status: 500 }

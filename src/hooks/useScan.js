@@ -4,15 +4,16 @@ import { useState, useCallback } from "react";
 import { auth } from "@/lib/firebase";
 
 /**
- * Compress an image file using canvas to reduce size before sending to API.
- * Target: max 1024px on longest side, JPEG quality 0.7.
- * This significantly reduces token usage (and therefore cost).
+ * Compress an image file using canvas before sending to API.
+ * Target: max 1568px on longest side (Anthropic's internal max before downscale).
+ * Prefers PNG (lossless, preserves text edges and gridlines for table extraction).
+ * Falls back to JPEG at 0.92 quality if PNG exceeds 4MB.
  */
 function compressImage(file) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
-      const MAX_DIM = 1024;
+      const MAX_DIM = 1568;
       let { width, height } = img;
 
       if (width > MAX_DIM || height > MAX_DIM) {
@@ -31,10 +32,19 @@ function compressImage(file) {
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, width, height);
 
-      // Convert to JPEG base64 at 0.7 quality
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
-      const base64 = dataUrl.split(",")[1];
-      resolve({ base64, mediaType: "image/jpeg" });
+      // Prefer PNG for tables/text (lossless preserves gridlines and text edges).
+      // Fall back to high-quality JPEG if PNG exceeds 4MB base64 (~3MB raw).
+      const pngDataUrl = canvas.toDataURL("image/png");
+      const pngBase64 = pngDataUrl.split(",")[1];
+
+      const PNG_SIZE_LIMIT = 4 * 1024 * 1024; // 4MB in base64 characters
+      if (pngBase64.length <= PNG_SIZE_LIMIT) {
+        resolve({ base64: pngBase64, mediaType: "image/png" });
+      } else {
+        const jpegDataUrl = canvas.toDataURL("image/jpeg", 0.92);
+        const jpegBase64 = jpegDataUrl.split(",")[1];
+        resolve({ base64: jpegBase64, mediaType: "image/jpeg" });
+      }
     };
     img.onerror = () => {
       // Fall back to raw file if canvas fails
@@ -112,11 +122,14 @@ export function useScan() {
 
     for (let i = 0; i < images.length; i++) {
       setCurrentImage(i + 1);
-      setProgress((i / images.length) * 100);
+      setProgress(((i + 0.5) / images.length) * 100);
 
       try {
         // Compress image to reduce API token usage
         const { base64, mediaType } = await compressImage(images[i].file);
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 120000);
 
         const response = await fetch("/api/extract", {
           method: "POST",
@@ -125,7 +138,10 @@ export function useScan() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ image: base64, mediaType }),
+          signal: controller.signal,
         });
+
+        clearTimeout(timeout);
 
         const data = await response.json();
 
@@ -153,10 +169,10 @@ export function useScan() {
           });
         }
       } catch (err) {
-        setErrors((prev) => [
-          ...prev,
-          `Image ${i + 1} (${images[i].name}): ${err.message}`,
-        ]);
+        const msg = err.name === "AbortError"
+          ? `Image ${i + 1} (${images[i].name}): Request timed out. Try a smaller image.`
+          : `Image ${i + 1} (${images[i].name}): ${err.message}`;
+        setErrors((prev) => [...prev, msg]);
       }
 
       setProgress(((i + 1) / images.length) * 100);

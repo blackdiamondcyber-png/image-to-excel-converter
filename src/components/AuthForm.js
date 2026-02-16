@@ -5,6 +5,25 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 
+/**
+ * Map Firebase error codes to user-friendly messages.
+ */
+function friendlyError(err) {
+  const code = err?.code || "";
+  const map = {
+    "auth/wrong-password": "Incorrect password. Please try again.",
+    "auth/invalid-credential": "Incorrect email or password. Please try again.",
+    "auth/user-not-found": "No account found with this email.",
+    "auth/email-already-in-use": "An account already exists with this email.",
+    "auth/weak-password": "Password must be at least 6 characters.",
+    "auth/invalid-email": "Please enter a valid email address.",
+    "auth/too-many-requests": "Too many attempts. Please wait a moment and try again.",
+    "auth/network-request-failed": "Network error. Please check your connection.",
+    "auth/user-disabled": "This account has been disabled. Contact support.",
+  };
+  return map[code] || err?.message || "Something went wrong";
+}
+
 export default function AuthForm({ mode = "login" }) {
   const router = useRouter();
   const { signIn, signUp, resetPassword } = useAuth();
@@ -35,7 +54,7 @@ export default function AuthForm({ mode = "login" }) {
         router.replace("/");
       }
     } catch (err) {
-      setError(err.message || "Something went wrong");
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }
@@ -58,7 +77,7 @@ export default function AuthForm({ mode = "login" }) {
       setSuccess("Password reset email sent! Check your inbox.");
       setShowReset(false);
     } catch (err) {
-      setError(err.message || "Failed to send reset email");
+      setError(friendlyError(err));
     } finally {
       setLoading(false);
     }

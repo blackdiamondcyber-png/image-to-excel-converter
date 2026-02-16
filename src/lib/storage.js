@@ -14,8 +14,8 @@ export async function uploadFile(userId, folder, fileName, fileData, contentType
   try {
     await uploadBytes(storageRef, fileData, { contentType });
     return path;
-  } catch (error) {
-    console.error("Storage upload error:", error);
+  } catch {
+    // Storage operation failed — return null
     return null;
   }
 }
@@ -42,8 +42,8 @@ export async function deleteFile(path) {
   try {
     const storageRef = ref(storage, path);
     await deleteObject(storageRef);
-  } catch (error) {
-    console.error("Storage delete error:", error);
+  } catch {
+    // Delete failed — no action needed
   }
 }
 
@@ -56,8 +56,8 @@ export async function getFileUrl(path) {
   try {
     const storageRef = ref(storage, path);
     return await getDownloadURL(storageRef);
-  } catch (error) {
-    console.error("Download URL error:", error);
+  } catch {
+    // URL fetch failed — return null
     return null;
   }
 }

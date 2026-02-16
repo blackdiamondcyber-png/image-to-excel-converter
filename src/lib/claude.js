@@ -3,7 +3,43 @@
  * Never import this file from client components.
  */
 
-const EXTRACTION_PROMPT = `Analyze this image and extract ALL tabular data you can find. Return ONLY a valid JSON object with this exact structure, no markdown, no backticks, no explanation:
+const SYSTEM_MESSAGE = `You are an expert document analyst with perfect vision and meticulous attention to detail. Your specialty is extracting tabular data from photographs of documents with 100% fidelity. You never guess, hallucinate, or repeat data — every value you output was read directly from the image.`;
+
+const EXTRACTION_PROMPT = `Extract ALL tabular data from this image. Follow these steps carefully:
+
+**Step 1 — Survey the image:**
+Identify how many distinct tables are in the image. Note the boundaries of each.
+
+**Step 2 — For each table, analyze its structure:**
+- Count the exact number of columns and identify each column header.
+- Count the exact number of data rows (excluding the header row).
+- A table with N data rows must produce exactly N rows in the output.
+
+**Step 3 — Extract row by row:**
+Read each row from top to bottom, left to right. For every cell:
+- Transcribe the EXACT text visible in the image.
+- Do NOT add any punctuation (periods, dots, slashes, commas) that is not visibly printed.
+- Do NOT expand or correct abbreviations — copy them exactly as printed.
+- If a cell is empty or blank, use an empty string "".
+- If a cell is partially obscured, transcribe what you can see and use "[unclear]" for unreadable parts.
+
+**Step 4 — Self-check:**
+- Verify that each row in your output is UNIQUE (unless two rows are truly identical in the image).
+- Verify the number of output rows matches the number you counted in Step 2.
+- Verify every row has the same number of values as there are column headers (pad with "" if needed).
+
+**CRITICAL anti-hallucination rules:**
+- NEVER copy-paste the same row multiple times. Each row must be independently read from the image.
+- If you cannot read a row clearly, output it with "[unclear]" markers rather than duplicating another row.
+- Different rows that look similar STILL have different data — read each one independently.
+
+**Transcription fidelity:**
+- Transcribe text EXACTLY as it appears — do NOT add, remove, or change any characters.
+- Do NOT add periods, dots, slashes, or any punctuation not visibly present in the image.
+- Do NOT expand or correct abbreviations — copy them exactly as printed (e.g. if it says "QTY" keep "QTY", not "Qty.").
+- When in doubt, leave punctuation OUT rather than adding it.
+
+Return a JSON object with this exact structure (no markdown fences, no explanation outside the JSON):
 {
   "tables": [
     {
@@ -15,23 +51,7 @@ const EXTRACTION_PROMPT = `Analyze this image and extract ALL tabular data you c
       ]
     }
   ]
-}
-Rules:
-- Extract every table, list, or structured data you see
-- If data isn't clearly tabular, structure it into the most logical table format
-- Keep all values as strings
-- If there are multiple distinct tables, include them all in the "tables" array
-- If you see a price list, invoice, form, or any structured content, convert it to tabular format
-- Pad shorter rows with empty strings so every row has the same number of columns as headers
-- Return ONLY the JSON, nothing else
-
-CRITICAL — Transcription fidelity:
-- Transcribe text EXACTLY as it appears in the image — do NOT add, remove, or change any characters
-- Do NOT add periods, dots, slashes, or any punctuation that is not visibly present in the image
-- Do NOT expand or correct abbreviations — copy them exactly as printed (e.g. if it says "QTY" keep "QTY", not "Qty.")
-- Do NOT add trailing periods to words, names, descriptions, or abbreviations
-- If a cell in the image has no period at the end, the extracted value must have no period at the end
-- When in doubt, leave punctuation OUT rather than adding it`;
+}`;
 
 export async function extractTablesFromImage(base64Data, mediaType) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -42,8 +62,10 @@ export async function extractTablesFromImage(base64Data, mediaType) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 4096,
+      model: "claude-sonnet-4-5-20250514",
+      max_tokens: 16384,
+      temperature: 0,
+      system: SYSTEM_MESSAGE,
       messages: [
         {
           role: "user",
@@ -80,7 +102,13 @@ export async function extractTablesFromImage(base64Data, mediaType) {
     .map((item) => item.text)
     .join("\n");
 
-  const cleaned = text.replace(/```json|```/g, "").trim();
+  // Strip markdown fences and extract the JSON object from any surrounding text
+  let cleaned = text.replace(/```json|```/g, "").trim();
+  const jsonStart = cleaned.indexOf("{");
+  const jsonEnd = cleaned.lastIndexOf("}");
+  if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+    cleaned = cleaned.slice(jsonStart, jsonEnd + 1);
+  }
 
   let parsed;
   try {
@@ -93,16 +121,19 @@ export async function extractTablesFromImage(base64Data, mediaType) {
     throw new Error("Claude response missing tables array");
   }
 
-  return parsed.tables.map((t) => ({
-    title: t.title || "Extracted Table",
-    headers: t.headers || [],
-    rows: (t.rows || []).map((row) => {
-      // Pad rows to match header length
-      const padded = [...row];
-      while (padded.length < (t.headers || []).length) {
-        padded.push("");
-      }
-      return padded.map(String);
-    }),
-  }));
+  return parsed.tables
+    .filter((t) => Array.isArray(t.headers) && t.headers.length > 0 && Array.isArray(t.rows) && t.rows.length > 0)
+    .map((t) => ({
+      title: t.title || "Extracted Table",
+      headers: t.headers.map(String),
+      rows: t.rows.map((row) => {
+        const arr = Array.isArray(row) ? row : [];
+        // Pad rows to match header length
+        const padded = [...arr];
+        while (padded.length < t.headers.length) {
+          padded.push("");
+        }
+        return padded.map((cell) => String(cell ?? ""));
+      }),
+    }));
 }

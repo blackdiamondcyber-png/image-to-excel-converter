@@ -11,7 +11,7 @@ export default function ScanCard({ scan, onView, onDelete }) {
     setDeleting(true);
     try {
       await onDelete(scan.id);
-    } catch {
+    } finally {
       setDeleting(false);
     }
   };

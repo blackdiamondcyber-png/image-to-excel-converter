@@ -27,13 +27,13 @@ export default function ExportStep({ tables, onReset }) {
       downloadExcel(tables);
       setDownloaded(true);
       toast.success("Excel file downloaded");
-    } catch (err) {
-      console.error("Export error:", err);
+    } catch {
       toast.error("Failed to generate Excel file");
     }
   };
 
   const handleSaveAs = async () => {
+    if (saving) return;
     setSaving("saveas");
     try {
       const result = await saveExcelAs(tables);
@@ -46,8 +46,7 @@ export default function ExportStep({ tables, onReset }) {
       } else if (result === "cancelled") {
         // User dismissed the Save As picker — do nothing
       }
-    } catch (err) {
-      console.error("Save As error:", err);
+    } catch {
       toast.error("Failed to save file");
     } finally {
       setSaving(null);
@@ -55,6 +54,7 @@ export default function ExportStep({ tables, onReset }) {
   };
 
   const handleGoogleDrive = async () => {
+    if (saving) return;
     setSaving("gdrive");
     try {
       const result = await saveToGoogleDrive(tables);
@@ -67,8 +67,7 @@ export default function ExportStep({ tables, onReset }) {
       } else if (result === "cancelled") {
         toast.warning("Share cancelled");
       }
-    } catch (err) {
-      console.error("Google Drive error:", err);
+    } catch {
       toast.error("Failed to save to Google Drive");
     } finally {
       setSaving(null);
@@ -76,6 +75,7 @@ export default function ExportStep({ tables, onReset }) {
   };
 
   const handleOneDrive = async () => {
+    if (saving) return;
     setSaving("onedrive");
     try {
       const result = await saveToOneDrive(tables);
@@ -88,8 +88,7 @@ export default function ExportStep({ tables, onReset }) {
       } else if (result === "cancelled") {
         toast.warning("Share cancelled");
       }
-    } catch (err) {
-      console.error("OneDrive error:", err);
+    } catch {
       toast.error("Failed to save to OneDrive");
     } finally {
       setSaving(null);
@@ -97,6 +96,7 @@ export default function ExportStep({ tables, onReset }) {
   };
 
   const handleDropbox = async () => {
+    if (saving) return;
     setSaving("dropbox");
     try {
       const result = await saveToDropbox(tables);
@@ -109,8 +109,7 @@ export default function ExportStep({ tables, onReset }) {
       } else if (result === "cancelled") {
         toast.warning("Share cancelled");
       }
-    } catch (err) {
-      console.error("Dropbox error:", err);
+    } catch {
       toast.error("Failed to save to Dropbox");
     } finally {
       setSaving(null);
@@ -118,6 +117,7 @@ export default function ExportStep({ tables, onReset }) {
   };
 
   const handleShare = async () => {
+    if (saving) return;
     setSaving("share");
     try {
       const shared = await shareFile(tables);

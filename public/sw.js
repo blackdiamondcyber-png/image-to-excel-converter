@@ -1,4 +1,4 @@
-const CACHE_NAME = "rohan-v2";
+const CACHE_NAME = "rohan-v3";
 const STATIC_ASSETS = ["/", "/history", "/login", "/signup", "/offline.html"];
 
 // Install: cache the app shell

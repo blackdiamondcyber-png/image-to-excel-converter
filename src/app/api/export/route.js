@@ -7,7 +7,47 @@ const MAX_ROWS_PER_TABLE = 10000;
 const MAX_COLUMNS = 100;
 
 /**
- * Lightweight auth check — verifies the request has a valid Firebase token.
+ * Verify a Firebase ID token via REST API fallback.
+ */
+async function verifyTokenViaRest(idToken) {
+  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
+  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  if (!apiKey || !projectId) return false;
+
+  try {
+    const res = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      }
+    );
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (!data.users?.[0]) return false;
+
+    // Validate JWT claims (expiration and audience)
+    const parts = idToken.split(".");
+    if (parts.length !== 3) return false;
+    try {
+      const payload = JSON.parse(Buffer.from(parts[1], "base64").toString());
+      const now = Math.floor(Date.now() / 1000);
+      if (!payload.exp || payload.exp < now) return false;
+      if (!payload.aud || payload.aud !== projectId) return false;
+    } catch {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Auth check — verifies the request has a valid Firebase token.
+ * Tries Admin SDK first, falls back to REST API verification.
  */
 async function isAuthenticated(request) {
   const authHeader = request.headers.get("authorization");
@@ -16,15 +56,19 @@ async function isAuthenticated(request) {
   const token = authHeader.split("Bearer ")[1];
   if (!token || token.length < 20) return false;
 
+  // Strategy 1: Firebase Admin SDK
   const auth = getAdminAuth();
-  if (!auth) return false;
-
-  try {
-    await auth.verifyIdToken(token);
-    return true;
-  } catch {
-    return false;
+  if (auth) {
+    try {
+      await auth.verifyIdToken(token);
+      return true;
+    } catch {
+      // Fall through to REST fallback
+    }
   }
+
+  // Strategy 2: Firebase REST API fallback
+  return verifyTokenViaRest(token);
 }
 
 /**
@@ -86,8 +130,7 @@ export async function POST(request) {
         "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
-  } catch (err) {
-    console.error("Export API error:", err);
+  } catch {
     return NextResponse.json(
       { error: "Failed to generate Excel file. Please try again." },
       { status: 500 }

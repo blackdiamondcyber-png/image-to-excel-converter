@@ -45,7 +45,8 @@ export default function ReviewStep({ tables, setTables, onExport, onBack }) {
         </button>
         <button
           onClick={onExport}
-          className="flex-[2] py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-success to-emerald-600 text-white text-sm font-bold cursor-pointer shadow-[0_4px_20px_rgba(52,211,153,0.3)] flex items-center justify-center gap-2 hover:opacity-90 active:opacity-80 transition-opacity min-h-[48px]"
+          disabled={tables.length === 0 || totalRows === 0}
+          className="flex-[2] py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-success to-emerald-600 text-white text-sm font-bold cursor-pointer shadow-[0_4px_20px_rgba(52,211,153,0.3)] flex items-center justify-center gap-2 hover:opacity-90 active:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed min-h-[48px]"
         >
           📥 Export to Excel
         </button>

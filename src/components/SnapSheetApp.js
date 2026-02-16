@@ -45,6 +45,7 @@ export default function SnapSheetApp() {
   }, [images, resetScan]);
 
   const handleProcess = useCallback(async () => {
+    if (isProcessing) return; // Guard against double-clicks
     setStep("processing");
     const extracted = await processImages(images);
     if (extracted.length > 0) {
@@ -55,7 +56,7 @@ export default function SnapSheetApp() {
         );
       }, 600);
     }
-  }, [images, processImages, toast]);
+  }, [images, isProcessing, processImages, toast]);
 
   const handleExport = useCallback(() => {
     setStep("export");
@@ -74,8 +75,7 @@ export default function SnapSheetApp() {
         });
         setScanSaved(true);
         toast.success("Scan saved to your history");
-      } catch (err) {
-        console.error("Failed to save scan:", err);
+      } catch {
         toast.warning("Scan exported but could not save to history");
       }
     }
@@ -126,6 +126,8 @@ export default function SnapSheetApp() {
           progress={progress}
           currentImage={currentImage}
           errors={errors}
+          isProcessing={isProcessing}
+          onRetry={handleReset}
         />
       )}
 
@@ -141,21 +143,6 @@ export default function SnapSheetApp() {
       {step === "export" && (
         <ExportStep tables={tables} onReset={handleReset} />
       )}
-
-      {/* Processing failed — show retry */}
-      {step === "processing" &&
-        errors.length > 0 &&
-        !isProcessing &&
-        tables.length === 0 && (
-          <div className="px-5 pb-5 text-center">
-            <button
-              onClick={handleReset}
-              className="px-6 py-3.5 rounded-[10px] border border-snap-border bg-snap-surface text-snap-text text-[13px] cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors min-h-[48px]"
-            >
-              ← Try Again with Different Images
-            </button>
-          </div>
-        )}
 
       <BottomNav />
     </div>

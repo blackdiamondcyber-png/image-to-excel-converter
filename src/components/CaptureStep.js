@@ -140,7 +140,10 @@ export default function CaptureStep({ images, setImages, onProcess }) {
           <div className="grid grid-cols-2 gap-3 mt-1">
             {/* Gallery Card */}
             <div
+              role="button"
+              tabIndex={0}
               onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInputRef.current?.click(); } }}
               className="group border border-snap-border rounded-2xl bg-gradient-to-b from-snap-surface to-snap-bg text-center cursor-pointer py-4 px-3 transition-all duration-200 hover:border-snap-accent hover:shadow-[0_0_20px_rgba(79,142,247,0.08)] active:scale-[0.97]"
             >
               <div className="flex justify-center mb-2.5">
@@ -158,7 +161,10 @@ export default function CaptureStep({ images, setImages, onProcess }) {
 
             {/* Camera Card */}
             <div
+              role="button"
+              tabIndex={0}
               onClick={() => cameraInputRef.current?.click()}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); cameraInputRef.current?.click(); } }}
               className="group border border-snap-border rounded-2xl bg-gradient-to-b from-snap-surface to-snap-bg text-center cursor-pointer py-4 px-3 transition-all duration-200 hover:border-snap-accent hover:shadow-[0_0_20px_rgba(79,142,247,0.08)] active:scale-[0.97]"
             >
               <div className="flex justify-center mb-2.5">
@@ -219,7 +225,10 @@ export default function CaptureStep({ images, setImages, onProcess }) {
         <>
           {/* Compact Upload Box */}
           <div
+            role="button"
+            tabIndex={0}
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInputRef.current?.click(); } }}
             className="border border-dashed border-snap-border rounded-2xl text-center cursor-pointer bg-snap-surface py-5 px-5 transition-all duration-300 hover:border-snap-accent active:border-snap-accent hover:bg-snap-accent-glow active:bg-snap-accent-glow"
           >
             <div className="text-2xl mb-1">➕</div>

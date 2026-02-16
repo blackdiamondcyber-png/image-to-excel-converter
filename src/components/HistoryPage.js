@@ -103,28 +103,11 @@ export default function HistoryPage() {
           )}
         </div>
 
-        {/* Not logged in */}
-        {!authLoading && !user && (
-          <EmptyState
-            icon="🔐"
-            title="Sign in to see history"
-            description="Your scan history is saved to your account. Sign in or create an account to get started."
-            action={
-              <Link
-                href="/login"
-                className="inline-block px-6 py-3.5 rounded-xl bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-semibold no-underline hover:opacity-90 active:opacity-80 transition-opacity min-h-[48px]"
-              >
-                Sign In
-              </Link>
-            }
-          />
-        )}
-
         {/* Loading */}
-        {(loading || authLoading) && user && <SkeletonList count={3} />}
+        {(loading || authLoading) && <SkeletonList count={3} />}
 
         {/* Empty state */}
-        {!loading && user && scans.length === 0 && (
+        {!loading && !authLoading && scans.length === 0 && (
           <EmptyState
             icon="📷"
             title="No scans yet"
