@@ -110,11 +110,14 @@ export default function SnapSheetApp() {
       <StepIndicator current={step} />
 
       {step === "capture" && (
-        <CaptureStep
-          images={images}
-          setImages={setImages}
-          onProcess={handleProcess}
-        />
+        <>
+          <CaptureStep
+            images={images}
+            setImages={setImages}
+            onProcess={handleProcess}
+          />
+          <InstallPrompt />
+        </>
       )}
 
       {step === "processing" && (
@@ -154,7 +157,6 @@ export default function SnapSheetApp() {
           </div>
         )}
 
-      {step === "capture" && <InstallPrompt />}
       <BottomNav />
     </div>
   );
