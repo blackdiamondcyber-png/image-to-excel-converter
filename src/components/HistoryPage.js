@@ -66,7 +66,7 @@ export default function HistoryPage() {
   // Viewing a saved scan's data
   if (viewMode === "review") {
     return (
-      <div className="bg-snap-bg min-h-screen max-w-[480px] mx-auto font-sans flex flex-col relative pb-16">
+      <div className="bg-snap-bg min-h-screen min-h-[100dvh] max-w-[500px] mx-auto font-sans flex flex-col relative pb-[72px]">
         <Header step="review" onReset={handleBack} />
         <ReviewStep
           tables={viewTables}
@@ -81,7 +81,7 @@ export default function HistoryPage() {
 
   if (viewMode === "export") {
     return (
-      <div className="bg-snap-bg min-h-screen max-w-[480px] mx-auto font-sans flex flex-col relative pb-16">
+      <div className="bg-snap-bg min-h-screen min-h-[100dvh] max-w-[500px] mx-auto font-sans flex flex-col relative pb-[72px]">
         <Header step="export" onReset={handleBack} />
         <ExportStep tables={viewTables} onReset={handleBack} />
         <BottomNav />
@@ -90,10 +90,10 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="bg-snap-bg min-h-screen max-w-[480px] mx-auto font-sans flex flex-col relative pb-16">
+    <div className="bg-snap-bg min-h-screen min-h-[100dvh] max-w-[500px] mx-auto font-sans flex flex-col relative pb-[72px]">
       <Header step="capture" onReset={() => router.push("/")} />
 
-      <div className="p-5 flex-1">
+      <div className="px-4 sm:px-5 py-5 flex-1">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-snap-text text-lg font-bold">Scan History</h2>
           {scans.length > 0 && (
@@ -112,7 +112,7 @@ export default function HistoryPage() {
             action={
               <Link
                 href="/login"
-                className="px-6 py-3 rounded-xl bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-semibold no-underline hover:opacity-90 transition-opacity"
+                className="inline-block px-6 py-3.5 rounded-xl bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-semibold no-underline hover:opacity-90 active:opacity-80 transition-opacity min-h-[48px]"
               >
                 Sign In
               </Link>
@@ -132,7 +132,7 @@ export default function HistoryPage() {
             action={
               <Link
                 href="/"
-                className="px-6 py-3 rounded-xl bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-semibold no-underline hover:opacity-90 transition-opacity"
+                className="inline-block px-6 py-3.5 rounded-xl bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-semibold no-underline hover:opacity-90 active:opacity-80 transition-opacity min-h-[48px]"
               >
                 Start Scanning
               </Link>

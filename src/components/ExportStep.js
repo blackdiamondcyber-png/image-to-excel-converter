@@ -123,7 +123,7 @@ export default function ExportStep({ tables, onReset }) {
 
   if (!downloaded) {
     return (
-      <div className="px-5 py-6 flex-1 flex flex-col items-center">
+      <div className="px-4 sm:px-5 py-6 flex-1 flex flex-col items-center">
         <div className="text-5xl mb-4">📊</div>
         <h2 className="text-snap-text text-xl font-bold mb-2">
           Ready to Export
@@ -134,11 +134,11 @@ export default function ExportStep({ tables, onReset }) {
         </p>
 
         {/* Primary actions */}
-        <div className="w-full max-w-[320px] space-y-2.5 mb-5">
+        <div className="w-full max-w-[340px] space-y-2.5 mb-5">
           <button
             onClick={handleSaveAs}
             disabled={!!saving}
-            className="w-full py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-success to-emerald-600 text-white text-sm font-bold cursor-pointer shadow-[0_4px_24px_rgba(52,211,153,0.35)] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-success to-emerald-600 text-white text-sm font-bold cursor-pointer shadow-[0_4px_24px_rgba(52,211,153,0.35)] hover:opacity-90 active:opacity-80 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 min-h-[48px]"
           >
             📥 {saving === "saveas" ? "Saving..." : "Save .xlsx File"}
           </button>
@@ -146,14 +146,14 @@ export default function ExportStep({ tables, onReset }) {
           <button
             onClick={handleDownload}
             disabled={!!saving}
-            className="w-full py-3 rounded-xl border border-snap-border bg-snap-surface text-snap-text text-[13px] font-medium cursor-pointer hover:border-snap-border-focus transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-xl border border-snap-border bg-snap-surface text-snap-text text-[13px] font-medium cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[48px]"
           >
             ⬇️ Quick Download
           </button>
         </div>
 
         {/* Cloud save options */}
-        <div className="w-full max-w-[320px]">
+        <div className="w-full max-w-[340px]">
           <p className="text-snap-text-dim text-[11px] uppercase tracking-wider font-medium mb-2.5 text-center">
             Save to Cloud Drive
           </p>
@@ -161,7 +161,7 @@ export default function ExportStep({ tables, onReset }) {
             <button
               onClick={handleGoogleDrive}
               disabled={!!saving}
-              className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border border-snap-border bg-snap-surface cursor-pointer hover:border-snap-border-focus transition-colors disabled:opacity-50"
+              className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border border-snap-border bg-snap-surface cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors disabled:opacity-50 min-h-[64px]"
             >
               <span className="text-lg">🟢</span>
               <span className="text-snap-text-muted text-[10px] font-medium">
@@ -171,7 +171,7 @@ export default function ExportStep({ tables, onReset }) {
             <button
               onClick={handleOneDrive}
               disabled={!!saving}
-              className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border border-snap-border bg-snap-surface cursor-pointer hover:border-snap-border-focus transition-colors disabled:opacity-50"
+              className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border border-snap-border bg-snap-surface cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors disabled:opacity-50 min-h-[64px]"
             >
               <span className="text-lg">🔵</span>
               <span className="text-snap-text-muted text-[10px] font-medium">
@@ -181,7 +181,7 @@ export default function ExportStep({ tables, onReset }) {
             <button
               onClick={handleDropbox}
               disabled={!!saving}
-              className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border border-snap-border bg-snap-surface cursor-pointer hover:border-snap-border-focus transition-colors disabled:opacity-50"
+              className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border border-snap-border bg-snap-surface cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors disabled:opacity-50 min-h-[64px]"
             >
               <span className="text-lg">🔷</span>
               <span className="text-snap-text-muted text-[10px] font-medium">
@@ -194,7 +194,7 @@ export default function ExportStep({ tables, onReset }) {
           <button
             onClick={handleShare}
             disabled={!!saving}
-            className="w-full mt-2.5 py-3 rounded-xl border border-snap-border bg-snap-surface text-snap-text-muted text-[13px] cursor-pointer hover:border-snap-border-focus transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full mt-2.5 py-3 rounded-xl border border-snap-border bg-snap-surface text-snap-text-muted text-[13px] cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors disabled:opacity-50 flex items-center justify-center gap-2 min-h-[48px]"
           >
             📤 {saving === "share" ? "Sharing..." : "Share to Other Apps"}
           </button>
@@ -217,13 +217,13 @@ export default function ExportStep({ tables, onReset }) {
       <div className="flex flex-wrap gap-2.5 justify-center">
         <button
           onClick={() => setDownloaded(false)}
-          className="px-6 py-3 rounded-[10px] border border-snap-border bg-snap-surface text-snap-text text-[13px] cursor-pointer hover:border-snap-border-focus transition-colors"
+          className="px-6 py-3.5 rounded-xl border border-snap-border bg-snap-surface text-snap-text text-[13px] cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors min-h-[48px]"
         >
           Save Again
         </button>
         <button
           onClick={onReset}
-          className="px-6 py-3 rounded-[10px] border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-[13px] font-semibold cursor-pointer hover:opacity-90 transition-opacity"
+          className="px-6 py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-[13px] font-semibold cursor-pointer hover:opacity-90 active:opacity-80 transition-opacity min-h-[48px]"
         >
           Scan More Images →
         </button>

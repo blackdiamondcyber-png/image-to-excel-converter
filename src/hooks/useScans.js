@@ -5,13 +5,23 @@ import { useState, useEffect, useCallback } from "react";
 const STORAGE_KEY = "rohan_scans";
 
 /**
- * Read scans from localStorage.
+ * Read scans from localStorage with validation.
  */
 function readFromStorage() {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    // Validate each scan has required fields
+    return parsed.filter(
+      (scan) =>
+        scan &&
+        typeof scan === "object" &&
+        typeof scan.id === "string" &&
+        !Object.prototype.hasOwnProperty.call(scan, "__proto__") // Reject prototype pollution
+    );
   } catch {
     return [];
   }

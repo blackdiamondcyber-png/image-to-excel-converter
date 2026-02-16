@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthForm({ mode = "login" }) {
@@ -27,7 +28,6 @@ export default function AuthForm({ mode = "login" }) {
       if (isSignUp) {
         const { error: err } = await signUp(email, password, name || undefined);
         if (err) throw err;
-        // Firebase auto-signs in after signup — redirect to app
         router.replace("/");
       } else {
         const { error: err } = await signIn(email, password);
@@ -65,15 +65,15 @@ export default function AuthForm({ mode = "login" }) {
   };
 
   return (
-    <div className="min-h-screen bg-snap-bg flex items-center justify-center p-5">
+    <div className="min-h-screen bg-snap-bg flex items-center justify-center px-5 py-8">
       <div className="w-full max-w-[380px]">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-snap-accent to-purple-600 flex items-center justify-center text-2xl mx-auto mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-snap-accent to-purple-600 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-snap-accent/20">
             📊
           </div>
           <h1 className="text-2xl font-bold text-snap-text">Rohan</h1>
-          <p className="text-snap-text-muted text-sm mt-1">
+          <p className="text-snap-text-muted text-sm mt-1.5">
             {showReset
               ? "Reset your password"
               : isSignUp
@@ -86,27 +86,29 @@ export default function AuthForm({ mode = "login" }) {
         {showReset ? (
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
-              <label className="block text-snap-text-muted text-xs font-medium mb-1.5">
+              <label htmlFor="reset-email" className="block text-snap-text-muted text-xs font-medium mb-1.5">
                 Email
               </label>
               <input
+                id="reset-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@company.com"
                 required
-                className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3 text-snap-text text-sm outline-none focus:border-snap-border-focus transition-colors placeholder:text-snap-text-dim"
+                autoComplete="email"
+                className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3.5 text-snap-text text-[16px] outline-none focus:border-snap-border-focus focus:ring-1 focus:ring-snap-accent/30 transition-colors placeholder:text-snap-text-dim"
               />
             </div>
 
             {error && (
-              <div className="bg-snap-danger-bg border border-snap-danger rounded-xl px-4 py-3 text-snap-danger text-xs">
+              <div className="bg-snap-danger-bg border border-snap-danger rounded-xl px-4 py-3 text-snap-danger text-xs" role="alert">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="bg-snap-success-bg border border-snap-success rounded-xl px-4 py-3 text-snap-success text-xs">
+              <div className="bg-snap-success-bg border border-snap-success rounded-xl px-4 py-3 text-snap-success text-xs" role="status">
                 {success}
               </div>
             )}
@@ -114,7 +116,7 @@ export default function AuthForm({ mode = "login" }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-bold cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-bold cursor-pointer hover:opacity-90 active:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
             >
               {loading ? "Sending..." : "Send Reset Link"}
             </button>
@@ -127,7 +129,7 @@ export default function AuthForm({ mode = "login" }) {
                   setError("");
                   setSuccess("");
                 }}
-                className="text-snap-accent hover:underline font-medium bg-transparent border-none cursor-pointer"
+                className="text-snap-accent hover:underline font-medium bg-transparent border-none cursor-pointer p-2 min-h-[44px]"
               >
                 Back to Sign In
               </button>
@@ -139,45 +141,51 @@ export default function AuthForm({ mode = "login" }) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (
                 <div>
-                  <label className="block text-snap-text-muted text-xs font-medium mb-1.5">
+                  <label htmlFor="name" className="block text-snap-text-muted text-xs font-medium mb-1.5">
                     Full Name
                   </label>
                   <input
+                    id="name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="John Doe"
-                    className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3 text-snap-text text-sm outline-none focus:border-snap-border-focus transition-colors placeholder:text-snap-text-dim"
+                    autoComplete="name"
+                    className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3.5 text-snap-text text-[16px] outline-none focus:border-snap-border-focus focus:ring-1 focus:ring-snap-accent/30 transition-colors placeholder:text-snap-text-dim"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-snap-text-muted text-xs font-medium mb-1.5">
+                <label htmlFor="email" className="block text-snap-text-muted text-xs font-medium mb-1.5">
                   Email
                 </label>
                 <input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@company.com"
                   required
-                  className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3 text-snap-text text-sm outline-none focus:border-snap-border-focus transition-colors placeholder:text-snap-text-dim"
+                  autoComplete="email"
+                  className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3.5 text-snap-text text-[16px] outline-none focus:border-snap-border-focus focus:ring-1 focus:ring-snap-accent/30 transition-colors placeholder:text-snap-text-dim"
                 />
               </div>
 
               <div>
-                <label className="block text-snap-text-muted text-xs font-medium mb-1.5">
+                <label htmlFor="password" className="block text-snap-text-muted text-xs font-medium mb-1.5">
                   Password
                 </label>
                 <input
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3 text-snap-text text-sm outline-none focus:border-snap-border-focus transition-colors placeholder:text-snap-text-dim"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  className="w-full bg-snap-surface border border-snap-border rounded-xl px-4 py-3.5 text-snap-text text-[16px] outline-none focus:border-snap-border-focus focus:ring-1 focus:ring-snap-accent/30 transition-colors placeholder:text-snap-text-dim"
                 />
               </div>
 
@@ -191,7 +199,7 @@ export default function AuthForm({ mode = "login" }) {
                       setError("");
                       setSuccess("");
                     }}
-                    className="text-snap-accent text-xs hover:underline font-medium bg-transparent border-none cursor-pointer p-0"
+                    className="text-snap-accent text-xs hover:underline font-medium bg-transparent border-none cursor-pointer p-1 min-h-[44px]"
                   >
                     Forgot password?
                   </button>
@@ -199,13 +207,13 @@ export default function AuthForm({ mode = "login" }) {
               )}
 
               {error && (
-                <div className="bg-snap-danger-bg border border-snap-danger rounded-xl px-4 py-3 text-snap-danger text-xs">
+                <div className="bg-snap-danger-bg border border-snap-danger rounded-xl px-4 py-3 text-snap-danger text-xs" role="alert">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="bg-snap-success-bg border border-snap-success rounded-xl px-4 py-3 text-snap-success text-xs">
+                <div className="bg-snap-success-bg border border-snap-success rounded-xl px-4 py-3 text-snap-success text-xs" role="status">
                   {success}
                 </div>
               )}
@@ -213,7 +221,7 @@ export default function AuthForm({ mode = "login" }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-bold cursor-pointer hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 rounded-xl border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-sm font-bold cursor-pointer hover:opacity-90 active:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
               >
                 {loading
                   ? "Please wait..."
@@ -224,26 +232,26 @@ export default function AuthForm({ mode = "login" }) {
             </form>
 
             {/* Toggle login/signup */}
-            <p className="text-center text-snap-text-muted text-xs mt-6">
+            <p className="text-center text-snap-text-muted text-sm mt-6">
               {isSignUp ? (
                 <>
                   Already have an account?{" "}
-                  <a
+                  <Link
                     href="/login"
                     className="text-snap-accent hover:underline font-medium"
                   >
                     Sign in
-                  </a>
+                  </Link>
                 </>
               ) : (
                 <>
                   Don&apos;t have an account?{" "}
-                  <a
+                  <Link
                     href="/signup"
                     className="text-snap-accent hover:underline font-medium"
                   >
                     Sign up
-                  </a>
+                  </Link>
                 </>
               )}
             </p>

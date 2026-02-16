@@ -33,11 +33,11 @@ export default function CaptureStep({ images, setImages, onProcess }) {
   };
 
   return (
-    <div className="p-5 flex-1">
+    <div className="px-4 sm:px-5 py-5 flex-1">
       {/* Upload Area */}
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-snap-border rounded-2xl text-center cursor-pointer bg-snap-surface transition-all duration-300 hover:border-snap-accent hover:bg-snap-accent-glow"
+        className="border-2 border-dashed border-snap-border rounded-2xl text-center cursor-pointer bg-snap-surface transition-all duration-300 hover:border-snap-accent active:border-snap-accent hover:bg-snap-accent-glow active:bg-snap-accent-glow"
         style={{ padding: images.length === 0 ? "48px 20px" : "24px 20px" }}
       >
         <div className="text-[40px] mb-3">
@@ -68,7 +68,7 @@ export default function CaptureStep({ images, setImages, onProcess }) {
       {/* Camera Button */}
       <button
         onClick={() => cameraInputRef.current?.click()}
-        className="w-full mt-3 py-3.5 rounded-xl border border-snap-border bg-snap-surface text-snap-text text-sm font-medium cursor-pointer flex items-center justify-center gap-2 hover:border-snap-border-focus transition-colors"
+        className="w-full mt-3 py-3.5 rounded-xl border border-snap-border bg-snap-surface text-snap-text text-sm font-medium cursor-pointer flex items-center justify-center gap-2 hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors min-h-[48px]"
       >
         📷 Take Photo with Camera
       </button>
@@ -90,24 +90,29 @@ export default function CaptureStep({ images, setImages, onProcess }) {
           {images.map((img, idx) => (
             <div
               key={img.id}
-              className="relative rounded-xl overflow-hidden border border-snap-border aspect-square"
+              className="relative rounded-xl overflow-hidden border border-snap-border aspect-square group"
             >
               <img
                 src={img.preview}
                 alt={img.name}
                 className="w-full h-full object-cover"
+                draggable={false}
               />
               <div className="absolute top-1.5 left-1.5 bg-black/70 text-white text-[10px] font-bold px-[7px] py-0.5 rounded-md">
                 {idx + 1}
               </div>
+              {/* Remove button — uses padding to expand touch target without visual overflow */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   removeImage(img.id);
                 }}
-                className="absolute top-1.5 right-1.5 bg-red-600/85 text-white border-none rounded-full w-[22px] h-[22px] text-xs cursor-pointer flex items-center justify-center leading-none min-w-[44px] min-h-[44px] -mt-[11px] -mr-[11px]"
+                className="absolute top-0 right-0 p-2 cursor-pointer bg-transparent border-none"
+                aria-label={`Remove image ${idx + 1}`}
               >
-                ✕
+                <span className="flex items-center justify-center w-5 h-5 bg-red-600/90 text-white rounded-full text-[10px] leading-none">
+                  ✕
+                </span>
               </button>
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent pt-3 px-2 pb-1.5">
                 <p className="text-white text-[9px] truncate">{img.name}</p>
@@ -121,10 +126,9 @@ export default function CaptureStep({ images, setImages, onProcess }) {
       {images.length > 0 && (
         <button
           onClick={onProcess}
-          className="w-full mt-5 py-4 rounded-xl border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-[15px] font-bold cursor-pointer shadow-[0_4px_20px_rgba(79,142,247,0.3)] flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          className="w-full mt-5 py-4 rounded-xl border-none bg-gradient-to-br from-snap-accent to-purple-600 text-white text-[15px] font-bold cursor-pointer shadow-[0_4px_20px_rgba(79,142,247,0.3)] flex items-center justify-center gap-2 hover:opacity-90 active:opacity-80 transition-opacity min-h-[52px]"
         >
-          ⚡ Process {images.length} Image{images.length !== 1 ? "s" : ""} with
-          AI
+          ⚡ Process {images.length} Image{images.length !== 1 ? "s" : ""} with AI
         </button>
       )}
     </div>

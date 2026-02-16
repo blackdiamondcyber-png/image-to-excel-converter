@@ -28,10 +28,13 @@ function resetIfNewDay() {
 }
 
 /**
- * Check if a user can make an extraction request.
+ * Atomically check and record an extraction for a user.
+ * This prevents race conditions where concurrent requests could
+ * bypass the rate limit by checking before any recording happens.
+ *
  * Returns { allowed: boolean, reason?: string, remaining: number }
  */
-export function checkRateLimit(userId) {
+export function checkAndRecordExtraction(userId) {
   resetIfNewDay();
 
   if (store.total >= GLOBAL_DAILY_LIMIT) {
@@ -51,17 +54,12 @@ export function checkRateLimit(userId) {
     };
   }
 
+  // Atomically increment before returning — prevents race condition
+  store.users[userId] = userCount + 1;
+  store.total += 1;
+
   return {
     allowed: true,
-    remaining: PER_USER_DAILY_LIMIT - userCount,
+    remaining: PER_USER_DAILY_LIMIT - userCount - 1,
   };
-}
-
-/**
- * Record an extraction for a user.
- */
-export function recordExtraction(userId) {
-  resetIfNewDay();
-  store.users[userId] = (store.users[userId] || 0) + 1;
-  store.total += 1;
 }

@@ -60,14 +60,15 @@ export default function ScanCard({ scan, onView, onDelete }) {
             e.stopPropagation();
             onView(scan);
           }}
-          className="flex-1 py-2 rounded-lg bg-snap-accent-glow border border-snap-accent text-snap-accent text-[11px] font-medium cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex-1 py-2.5 rounded-lg bg-snap-accent-glow border border-snap-accent text-snap-accent text-[12px] font-medium cursor-pointer hover:opacity-80 active:opacity-70 transition-opacity min-h-[44px]"
         >
           View & Export
         </button>
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="py-2 px-3 rounded-lg border border-snap-border text-snap-text-dim text-[11px] cursor-pointer hover:border-snap-danger hover:text-snap-danger transition-colors disabled:opacity-40 bg-transparent min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="py-2.5 px-3 rounded-lg border border-snap-border text-snap-text-dim text-[12px] cursor-pointer hover:border-snap-danger hover:text-snap-danger active:text-snap-danger transition-colors disabled:opacity-40 bg-transparent min-w-[44px] min-h-[44px] flex items-center justify-center"
+          aria-label="Delete scan"
         >
           {deleting ? "..." : "🗑"}
         </button>

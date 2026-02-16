@@ -95,7 +95,7 @@ export default function SnapSheetApp() {
   // Show loading while checking auth
   if (authLoading) {
     return (
-      <div className="bg-snap-bg min-h-screen max-w-[480px] mx-auto font-sans flex items-center justify-center">
+      <div className="bg-snap-bg min-h-screen min-h-[100dvh] max-w-[500px] mx-auto font-sans flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">📊</div>
           <p className="text-snap-text-muted text-sm">Loading...</p>
@@ -105,7 +105,7 @@ export default function SnapSheetApp() {
   }
 
   return (
-    <div className="bg-snap-bg min-h-screen max-w-[480px] mx-auto font-sans flex flex-col relative pb-16">
+    <div className="bg-snap-bg min-h-screen min-h-[100dvh] max-w-[500px] mx-auto font-sans flex flex-col relative pb-[72px]">
       <Header step={step} onReset={handleReset} />
       <StepIndicator current={step} />
 
@@ -147,7 +147,7 @@ export default function SnapSheetApp() {
           <div className="px-5 pb-5 text-center">
             <button
               onClick={handleReset}
-              className="px-6 py-3 rounded-[10px] border border-snap-border bg-snap-surface text-snap-text text-[13px] cursor-pointer hover:border-snap-border-focus transition-colors"
+              className="px-6 py-3.5 rounded-[10px] border border-snap-border bg-snap-surface text-snap-text text-[13px] cursor-pointer hover:border-snap-border-focus active:bg-snap-surface-hover transition-colors min-h-[48px]"
             >
               ← Try Again with Different Images
             </button>

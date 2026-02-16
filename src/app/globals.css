@@ -5,8 +5,18 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap");
 
 @layer base {
+  html {
+    /* Prevent pull-to-refresh on mobile */
+    overscroll-behavior-y: contain;
+  }
+
   body {
     @apply bg-snap-bg text-snap-text font-sans antialiased;
+    /* Prevent text size adjustment on orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Smooth scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -58,7 +68,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Ensure inputs don't zoom on iOS */
+/* Ensure inputs don't zoom on iOS (must be 16px+) */
 @media screen and (max-width: 768px) {
   input,
   select,
@@ -95,4 +105,9 @@
 /* Safe area for bottom nav on notched devices */
 .safe-area-bottom {
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Safe area for top on notched devices */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
 }

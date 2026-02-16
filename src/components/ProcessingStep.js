@@ -7,7 +7,7 @@ export default function ProcessingStep({
   errors,
 }) {
   return (
-    <div className="px-5 py-10 text-center">
+    <div className="px-4 sm:px-5 py-10 text-center">
       {/* Spinner */}
       <div className="w-16 h-16 mx-auto mb-6 rounded-full border-[3px] border-snap-border border-t-snap-accent animate-spin-slow" />
 
@@ -20,7 +20,7 @@ export default function ProcessingStep({
       </p>
 
       {/* Progress Bar */}
-      <div className="bg-snap-surface rounded-[10px] p-5 border border-snap-border max-w-[400px] mx-auto">
+      <div className="bg-snap-surface rounded-xl p-5 border border-snap-border max-w-[400px] mx-auto">
         <div className="flex justify-between mb-2.5">
           <span className="text-snap-text-muted text-xs">
             Processing image {currentImage} of {images.length}
@@ -29,9 +29,9 @@ export default function ProcessingStep({
             {Math.round(progress)}%
           </span>
         </div>
-        <div className="h-1.5 bg-snap-bg rounded-sm overflow-hidden">
+        <div className="h-2 bg-snap-bg rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-snap-accent to-purple-600 rounded-sm transition-all duration-500 ease-out"
+            className="h-full bg-gradient-to-r from-snap-accent to-purple-600 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -41,7 +41,8 @@ export default function ProcessingStep({
             {errors.map((err, i) => (
               <div
                 key={i}
-                className="bg-snap-danger-bg border border-snap-danger rounded-lg px-3 py-2 mt-1.5 text-[11px] text-snap-danger text-left"
+                className="bg-snap-danger-bg border border-snap-danger rounded-lg px-3 py-2.5 mt-1.5 text-[11px] text-snap-danger text-left"
+                role="alert"
               >
                 ⚠ {err}
               </div>
