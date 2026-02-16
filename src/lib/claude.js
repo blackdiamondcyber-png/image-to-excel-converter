@@ -21,10 +21,17 @@ Rules:
 - If data isn't clearly tabular, structure it into the most logical table format
 - Keep all values as strings
 - If there are multiple distinct tables, include them all in the "tables" array
-- Clean up OCR artifacts but preserve the original data
 - If you see a price list, invoice, form, or any structured content, convert it to tabular format
 - Pad shorter rows with empty strings so every row has the same number of columns as headers
-- Return ONLY the JSON, nothing else`;
+- Return ONLY the JSON, nothing else
+
+CRITICAL — Transcription fidelity:
+- Transcribe text EXACTLY as it appears in the image — do NOT add, remove, or change any characters
+- Do NOT add periods, dots, slashes, or any punctuation that is not visibly present in the image
+- Do NOT expand or correct abbreviations — copy them exactly as printed (e.g. if it says "QTY" keep "QTY", not "Qty.")
+- Do NOT add trailing periods to words, names, descriptions, or abbreviations
+- If a cell in the image has no period at the end, the extracted value must have no period at the end
+- When in doubt, leave punctuation OUT rather than adding it`;
 
 export async function extractTablesFromImage(base64Data, mediaType) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
