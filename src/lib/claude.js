@@ -3,55 +3,25 @@
  * Never import this file from client components.
  */
 
-const SYSTEM_MESSAGE = `You are an expert document analyst with perfect vision and meticulous attention to detail. Your specialty is extracting tabular data from photographs of documents with 100% fidelity. You never guess, hallucinate, or repeat data — every value you output was read directly from the image.`;
+const SYSTEM_MESSAGE = `You are an expert document analyst with perfect vision. You extract tabular data from photos of paper documents with 100% fidelity. You never hallucinate or repeat rows.`;
 
-const EXTRACTION_PROMPT = `Extract ALL tabular data from this image. Follow these steps carefully:
+const EXTRACTION_PROMPT = `Extract ALL tabular data from this image of a paper document.
 
-**Step 1 — Survey the image:**
-Identify how many distinct tables are in the image. Note the boundaries of each.
+**Step 1 — Identify structure:**
+Count the columns (note each header) and count the exact number of data rows.
 
-**Step 2 — For each table, analyze its structure:**
-- Count the exact number of columns and identify each column header.
-- Count the exact number of data rows (excluding the header row).
-- A table with N data rows must produce exactly N rows in the output.
+**Step 2 — Extract every row:**
+Read each row top-to-bottom, left-to-right. For every cell:
+- Transcribe EXACTLY what is printed — no added punctuation, no corrected abbreviations.
+- Empty cells → "". Unclear text → "[unclear]".
 
-**Step 3 — Extract row by row:**
-Read each row from top to bottom, left to right. For every cell:
-- Transcribe the EXACT text visible in the image.
-- Do NOT add any punctuation (periods, dots, slashes, commas) that is not visibly printed.
-- Do NOT expand or correct abbreviations — copy them exactly as printed.
-- If a cell is empty or blank, use an empty string "".
-- If a cell is partially obscured, transcribe what you can see and use "[unclear]" for unreadable parts.
+**Step 3 — Verify:**
+- Each row must be UNIQUE (unless truly identical in the image). NEVER duplicate rows.
+- Row count must match what you counted in Step 1.
+- Every row must have the same number of values as headers (pad with "" if needed).
 
-**Step 4 — Self-check:**
-- Verify that each row in your output is UNIQUE (unless two rows are truly identical in the image).
-- Verify the number of output rows matches the number you counted in Step 2.
-- Verify every row has the same number of values as there are column headers (pad with "" if needed).
-
-**CRITICAL anti-hallucination rules:**
-- NEVER copy-paste the same row multiple times. Each row must be independently read from the image.
-- If you cannot read a row clearly, output it with "[unclear]" markers rather than duplicating another row.
-- Different rows that look similar STILL have different data — read each one independently.
-
-**Transcription fidelity:**
-- Transcribe text EXACTLY as it appears — do NOT add, remove, or change any characters.
-- Do NOT add periods, dots, slashes, or any punctuation not visibly present in the image.
-- Do NOT expand or correct abbreviations — copy them exactly as printed (e.g. if it says "QTY" keep "QTY", not "Qty.").
-- When in doubt, leave punctuation OUT rather than adding it.
-
-Return a JSON object with this exact structure (no markdown fences, no explanation outside the JSON):
-{
-  "tables": [
-    {
-      "title": "Brief description of the table",
-      "headers": ["Column1", "Column2", ...],
-      "rows": [
-        ["value1", "value2", ...],
-        ["value1", "value2", ...]
-      ]
-    }
-  ]
-}`;
+Return ONLY this JSON (no markdown fences, no other text):
+{"tables":[{"title":"...","headers":["Col1","Col2"],"rows":[["val1","val2"]]}]}`;
 
 export async function extractTablesFromImage(base64Data, mediaType) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -62,8 +32,8 @@ export async function extractTablesFromImage(base64Data, mediaType) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-5-20250514",
-      max_tokens: 16384,
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 8192,
       temperature: 0,
       system: SYSTEM_MESSAGE,
       messages: [
