@@ -9,7 +9,7 @@ import ProcessingStep from "./ProcessingStep";
 import ReviewStep from "./ReviewStep";
 import ExportStep from "./ExportStep";
 import BottomNav from "./BottomNav";
-// InstallPrompt removed — users install via browser menu
+import InstallPrompt from "./InstallPrompt";
 import { useScan } from "@/hooks/useScan";
 import { useAuth } from "@/hooks/useAuth";
 import { useScans } from "@/hooks/useScans";
@@ -154,6 +154,7 @@ export default function SnapSheetApp() {
           </div>
         )}
 
+      {step === "capture" && <InstallPrompt />}
       <BottomNav />
     </div>
   );

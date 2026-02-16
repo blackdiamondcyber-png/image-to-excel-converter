@@ -8,6 +8,10 @@ export default function InstallPrompt() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    // Only show on mobile / touch devices
+    const isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    if (!isMobile) return;
+
     // Don't show if already installed as standalone
     if (window.matchMedia("(display-mode: standalone)").matches) return;
 

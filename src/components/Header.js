@@ -6,7 +6,7 @@ export default function Header({ step, onReset }) {
   const { user, signOut } = useAuth();
 
   return (
-    <header className="bg-gradient-to-br from-snap-surface to-snap-bg border-b border-snap-border px-4 sm:px-5 py-3.5 flex items-center justify-between sticky top-0 z-50 safe-area-top">
+    <header className="bg-gradient-to-br from-snap-surface to-snap-bg border-b border-snap-border px-4 sm:px-5 pt-4 pb-3 flex items-center justify-between sticky top-0 z-50 safe-area-top">
       <div className="flex items-center gap-3 min-w-0">
         <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-snap-accent to-purple-600 flex items-center justify-center text-lg shrink-0">
           📊
