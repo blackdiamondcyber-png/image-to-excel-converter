@@ -7,14 +7,14 @@ const MAX_IMAGES = 40;
 /* ── Inline SVG: document → spreadsheet illustration ── */
 function HeroIllustration() {
   return (
-    <div className="relative flex items-center justify-center pt-4 pb-2">
+    <div className="relative flex items-center justify-center pt-2 pb-1">
       {/* Soft glow behind the spreadsheet */}
       <div
         className="absolute right-1/4 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full opacity-40 blur-3xl pointer-events-none"
         style={{ background: "radial-gradient(circle, rgba(79,142,247,0.18) 0%, transparent 70%)" }}
       />
 
-      <svg width="220" height="150" viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="180" height="120" viewBox="0 0 220 150" fill="none" xmlns="http://www.w3.org/2000/svg">
         {/* ── Document / photo (left, tilted) ── */}
         <g transform="rotate(-7 55 80)">
           <rect x="20" y="30" width="70" height="90" rx="8" fill="#1A1D27" stroke="#2A2E3F" strokeWidth="1.5" />
@@ -115,7 +115,7 @@ export default function CaptureStep({ images, setImages, onProcess }) {
           <HeroIllustration />
 
           {/* Zone 2: Value Proposition */}
-          <div className="text-center px-2 pt-1 pb-3">
+          <div className="text-center px-2 pt-0 pb-2">
             <h2 className="text-snap-text text-lg font-bold tracking-tight">
               Turn Photos into Spreadsheets
             </h2>
@@ -137,11 +137,11 @@ export default function CaptureStep({ images, setImages, onProcess }) {
           </div>
 
           {/* Zone 3: Action Cards — 2-column grid */}
-          <div className="grid grid-cols-2 gap-3 mt-2">
+          <div className="grid grid-cols-2 gap-3 mt-1">
             {/* Gallery Card */}
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="group border border-snap-border rounded-2xl bg-gradient-to-b from-snap-surface to-snap-bg text-center cursor-pointer py-6 px-3 transition-all duration-200 hover:border-snap-accent hover:shadow-[0_0_20px_rgba(79,142,247,0.08)] active:scale-[0.97]"
+              className="group border border-snap-border rounded-2xl bg-gradient-to-b from-snap-surface to-snap-bg text-center cursor-pointer py-4 px-3 transition-all duration-200 hover:border-snap-accent hover:shadow-[0_0_20px_rgba(79,142,247,0.08)] active:scale-[0.97]"
             >
               <div className="flex justify-center mb-2.5">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +159,7 @@ export default function CaptureStep({ images, setImages, onProcess }) {
             {/* Camera Card */}
             <div
               onClick={() => cameraInputRef.current?.click()}
-              className="group border border-snap-border rounded-2xl bg-gradient-to-b from-snap-surface to-snap-bg text-center cursor-pointer py-6 px-3 transition-all duration-200 hover:border-snap-accent hover:shadow-[0_0_20px_rgba(79,142,247,0.08)] active:scale-[0.97]"
+              className="group border border-snap-border rounded-2xl bg-gradient-to-b from-snap-surface to-snap-bg text-center cursor-pointer py-4 px-3 transition-all duration-200 hover:border-snap-accent hover:shadow-[0_0_20px_rgba(79,142,247,0.08)] active:scale-[0.97]"
             >
               <div className="flex justify-center mb-2.5">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +199,7 @@ export default function CaptureStep({ images, setImages, onProcess }) {
           />
 
           {/* Zone 4: Confidence Footer */}
-          <div className="mt-auto pt-6 pb-1 text-center">
+          <div className="mt-auto pt-3 pb-1 text-center">
             <div className="flex items-center justify-center gap-3 text-snap-text-dim text-[10px]">
               <span>JPG</span>
               <span className="w-1 h-1 rounded-full bg-snap-border" />

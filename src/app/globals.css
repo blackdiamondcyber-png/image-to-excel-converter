@@ -109,5 +109,5 @@
 
 /* Safe area for top on notched devices — adds to existing padding */
 .safe-area-top {
-  padding-top: calc(2.5rem + env(safe-area-inset-top, 0px));
+  padding-top: calc(1rem + env(safe-area-inset-top, 0px));
 }
