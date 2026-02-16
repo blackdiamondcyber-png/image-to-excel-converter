@@ -33,7 +33,7 @@ export default function CaptureStep({ images, setImages, onProcess }) {
   };
 
   return (
-    <div className="px-4 sm:px-5 py-5 flex-1">
+    <div className="px-4 sm:px-5 py-5">
       {/* Upload Area */}
       <div
         onClick={() => fileInputRef.current?.click()}
