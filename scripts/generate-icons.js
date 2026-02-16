@@ -5,145 +5,153 @@ const fs = require("fs");
 const ICONS_DIR = path.join(__dirname, "..", "public", "icons");
 
 /**
- * App icon: Stylized Indian man with a turban made of spreadsheet grid.
- * The turban has flowing fabric folds with Excel-green color and white
- * grid lines woven in, with tiny cell references. A jewel pin at front.
- * Friendly face with warm skin tone, mustache, and confident smile.
+ * App icon: Indian man with white turban in front of an Excel spreadsheet
+ * and bar chart. The spreadsheet grid (green, with column headers A/B/C)
+ * fills the background. Colorful bar chart bars rise behind the character.
+ * The white turban is tall and distinctive — instantly reads as Indian.
  */
 function createIconSvg(size) {
   const rx = Math.round(size * 0.2);
   const s = size;
   const cx = s / 2;
-  const cy = s * 0.56; // face center
+  const cy = s * 0.62; // face center — pushed down to leave room for chart + grid
 
-  // Scale helper
+  // Scale helper — all dimensions relative to 512
   const r = (v) => +(v * s / 512).toFixed(2);
+
+  // Inner area boundaries
+  const inL = r(48);   // inner left
+  const inT = r(48);   // inner top
+  const inW = r(416);  // inner width
+  const inH = r(416);  // inner height
+  const inR = inL + inW; // inner right
+  const inB = inT + inH; // inner bottom
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
   <rect width="${s}" height="${s}" rx="${rx}" fill="#0F1117"/>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#4F8EF7"/>
-      <stop offset="100%" stop-color="#7C3AED"/>
-    </linearGradient>
-    <linearGradient id="turbanMain" x1="0.2" y1="0" x2="0.8" y2="1">
-      <stop offset="0%" stop-color="#22C55E"/>
-      <stop offset="50%" stop-color="#16A34A"/>
-      <stop offset="100%" stop-color="#15803D"/>
-    </linearGradient>
-    <linearGradient id="turbanLight" x1="0.3" y1="0" x2="0.7" y2="1">
-      <stop offset="0%" stop-color="#4ADE80"/>
-      <stop offset="100%" stop-color="#22C55E"/>
-    </linearGradient>
     <linearGradient id="skin" x1="0.5" y1="0" x2="0.5" y2="1">
       <stop offset="0%" stop-color="#D4956B"/>
       <stop offset="100%" stop-color="#C07844"/>
     </linearGradient>
-    <linearGradient id="shirt" x1="0.5" y1="0" x2="0.5" y2="1">
-      <stop offset="0%" stop-color="#1D6F3E"/>
-      <stop offset="100%" stop-color="#14532D"/>
+    <linearGradient id="turbanW" x1="0.3" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#F8F8F8"/>
+      <stop offset="50%" stop-color="#E8E8E8"/>
+      <stop offset="100%" stop-color="#D0D0D0"/>
     </linearGradient>
     <clipPath id="clip">
-      <rect x="${r(48)}" y="${r(48)}" width="${r(416)}" height="${r(416)}" rx="${r(80)}"/>
+      <rect x="${inL}" y="${inT}" width="${inW}" height="${inH}" rx="${r(80)}"/>
     </clipPath>
   </defs>
 
-  <!-- Inner rounded background -->
-  <rect x="${r(48)}" y="${r(48)}" width="${r(416)}" height="${r(416)}" rx="${r(80)}" fill="url(#bg)"/>
+  <!-- Inner rounded background — Excel green -->
+  <rect x="${inL}" y="${inT}" width="${inW}" height="${inH}" rx="${r(80)}" fill="#1B7A3D"/>
 
   <g clip-path="url(#clip)">
 
-    <!-- === BODY / SHIRT === -->
-    <ellipse cx="${cx}" cy="${r(500)}" rx="${r(130)}" ry="${r(90)}" fill="url(#shirt)"/>
-    <!-- Collar -->
-    <path d="M${cx - r(38)},${cy + r(80)} L${cx},${cy + r(100)} L${cx + r(38)},${cy + r(80)}" stroke="#15803D" stroke-width="${r(3)}" fill="none"/>
+    <!-- === SPREADSHEET GRID BACKGROUND === -->
 
-    <!-- Neck -->
-    <rect x="${cx - r(32)}" y="${cy + r(62)}" width="${r(64)}" height="${r(42)}" rx="${r(8)}" fill="url(#skin)"/>
-    <!-- Neck shadow -->
-    <ellipse cx="${cx}" cy="${cy + r(64)}" rx="${r(32)}" ry="${r(6)}" fill="#A0673A" opacity="0.3"/>
-
-    <!-- Ears -->
-    <ellipse cx="${cx - r(68)}" cy="${cy + r(4)}" rx="${r(14)}" ry="${r(18)}" fill="#C07844"/>
-    <ellipse cx="${cx - r(68)}" cy="${cy + r(4)}" rx="${r(8)}" ry="${r(12)}" fill="#B06A3A" opacity="0.4"/>
-    <ellipse cx="${cx + r(68)}" cy="${cy + r(4)}" rx="${r(14)}" ry="${r(18)}" fill="#C07844"/>
-    <ellipse cx="${cx + r(68)}" cy="${cy + r(4)}" rx="${r(8)}" ry="${r(12)}" fill="#B06A3A" opacity="0.4"/>
-
-    <!-- === FACE === -->
-    <ellipse cx="${cx}" cy="${cy}" rx="${r(66)}" ry="${r(78)}" fill="url(#skin)"/>
-
-    <!-- Eyes — white sclera -->
-    <ellipse cx="${cx - r(24)}" cy="${cy - r(6)}" rx="${r(12)}" ry="${r(11)}" fill="white"/>
-    <ellipse cx="${cx + r(24)}" cy="${cy - r(6)}" rx="${r(12)}" ry="${r(11)}" fill="white"/>
-    <!-- Iris -->
-    <circle cx="${cx - r(22)}" cy="${cy - r(4)}" r="${r(6.5)}" fill="#3B2510"/>
-    <circle cx="${cx + r(26)}" cy="${cy - r(4)}" r="${r(6.5)}" fill="#3B2510"/>
-    <!-- Pupil -->
-    <circle cx="${cx - r(21)}" cy="${cy - r(4)}" r="${r(3)}" fill="#1A1005"/>
-    <circle cx="${cx + r(27)}" cy="${cy - r(4)}" r="${r(3)}" fill="#1A1005"/>
-    <!-- Eye shine -->
-    <circle cx="${cx - r(19)}" cy="${cy - r(7)}" r="${r(2)}" fill="white" opacity="0.9"/>
-    <circle cx="${cx + r(29)}" cy="${cy - r(7)}" r="${r(2)}" fill="white" opacity="0.9"/>
-
-    <!-- Eyebrows -->
-    <path d="M${cx - r(38)},${cy - r(22)} Q${cx - r(24)},${cy - r(32)} ${cx - r(10)},${cy - r(24)}" stroke="#2D1810" stroke-width="${r(4.5)}" fill="none" stroke-linecap="round"/>
-    <path d="M${cx + r(10)},${cy - r(24)} Q${cx + r(24)},${cy - r(32)} ${cx + r(38)},${cy - r(22)}" stroke="#2D1810" stroke-width="${r(4.5)}" fill="none" stroke-linecap="round"/>
-
-    <!-- Nose -->
-    <path d="M${cx - r(2)},${cy + r(2)} Q${cx + r(12)},${cy + r(22)} ${cx + r(2)},${cy + r(24)} Q${cx - r(6)},${cy + r(26)} ${cx - r(8)},${cy + r(20)}" stroke="#A0673A" stroke-width="${r(2.5)}" fill="none" stroke-linecap="round"/>
-
-    <!-- Mustache -->
-    <path d="M${cx - r(30)},${cy + r(32)} Q${cx - r(14)},${cy + r(42)} ${cx},${cy + r(32)} Q${cx + r(14)},${cy + r(42)} ${cx + r(30)},${cy + r(32)}" fill="#1A0E06"/>
-    <!-- Mustache curls -->
-    <path d="M${cx - r(30)},${cy + r(32)} Q${cx - r(36)},${cy + r(34)} ${cx - r(34)},${cy + r(28)}" stroke="#1A0E06" stroke-width="${r(3)}" fill="none" stroke-linecap="round"/>
-    <path d="M${cx + r(30)},${cy + r(32)} Q${cx + r(36)},${cy + r(34)} ${cx + r(34)},${cy + r(28)}" stroke="#1A0E06" stroke-width="${r(3)}" fill="none" stroke-linecap="round"/>
-
-    <!-- Smile -->
-    <path d="M${cx - r(22)},${cy + r(42)} Q${cx},${cy + r(56)} ${cx + r(22)},${cy + r(42)}" stroke="#8B4020" stroke-width="${r(3)}" fill="none" stroke-linecap="round"/>
-    <!-- Lower lip hint -->
-    <path d="M${cx - r(14)},${cy + r(48)} Q${cx},${cy + r(54)} ${cx + r(14)},${cy + r(48)}" fill="#C0785E" opacity="0.4"/>
-
-    <!-- === TURBAN — flowing folds with spreadsheet grid === -->
-
-    <!-- Turban main dome -->
-    <path d="M${cx - r(90)},${cy - r(32)} Q${cx - r(95)},${cy - r(120)} ${cx},${cy - r(140)} Q${cx + r(95)},${cy - r(120)} ${cx + r(90)},${cy - r(32)}" fill="url(#turbanMain)"/>
-
-    <!-- Turban fold layers (flowing wraps) -->
-    <!-- Top fold -->
-    <path d="M${cx - r(70)},${cy - r(115)} Q${cx},${cy - r(135)} ${cx + r(70)},${cy - r(115)}" stroke="url(#turbanLight)" stroke-width="${r(16)}" fill="none" stroke-linecap="round"/>
-    <!-- Upper-mid fold -->
-    <path d="M${cx - r(82)},${cy - r(90)} Q${cx},${cy - r(108)} ${cx + r(82)},${cy - r(90)}" stroke="#22C55E" stroke-width="${r(15)}" fill="none" stroke-linecap="round"/>
-    <!-- Mid fold -->
-    <path d="M${cx - r(88)},${cy - r(66)} Q${cx},${cy - r(82)} ${cx + r(88)},${cy - r(66)}" stroke="#16A34A" stroke-width="${r(14)}" fill="none" stroke-linecap="round"/>
-    <!-- Lower fold (band across forehead) -->
-    <path d="M${cx - r(90)},${cy - r(42)} Q${cx},${cy - r(56)} ${cx + r(90)},${cy - r(42)}" stroke="#15803D" stroke-width="${r(16)}" fill="none" stroke-linecap="round"/>
-    <path d="M${cx - r(86)},${cy - r(42)} Q${cx},${cy - r(54)} ${cx + r(86)},${cy - r(42)}" stroke="#22C55E" stroke-width="${r(8)}" fill="none" stroke-linecap="round"/>
-
-    <!-- Turban side drapes -->
-    <ellipse cx="${cx - r(78)}" cy="${cy - r(32)}" rx="${r(22)}" ry="${r(40)}" fill="#16A34A"/>
-    <ellipse cx="${cx + r(78)}" cy="${cy - r(32)}" rx="${r(22)}" ry="${r(40)}" fill="#16A34A"/>
-
-    <!-- === SPREADSHEET GRID on turban === -->
-    <!-- Horizontal grid lines across folds -->
-    <line x1="${cx - r(60)}" y1="${cy - r(108)}" x2="${cx + r(60)}" y2="${cy - r(108)}" stroke="white" stroke-width="${r(1.2)}" opacity="0.35"/>
-    <line x1="${cx - r(72)}" y1="${cy - r(90)}" x2="${cx + r(72)}" y2="${cy - r(90)}" stroke="white" stroke-width="${r(1.2)}" opacity="0.35"/>
-    <line x1="${cx - r(80)}" y1="${cy - r(72)}" x2="${cx + r(80)}" y2="${cy - r(72)}" stroke="white" stroke-width="${r(1.2)}" opacity="0.3"/>
+    <!-- Horizontal grid lines -->
+    <line x1="${inL}" y1="${inT + r(50)}" x2="${inR}" y2="${inT + r(50)}" stroke="white" stroke-width="${r(1.5)}" opacity="0.25"/>
+    <line x1="${inL}" y1="${inT + r(100)}" x2="${inR}" y2="${inT + r(100)}" stroke="white" stroke-width="${r(1.5)}" opacity="0.25"/>
+    <line x1="${inL}" y1="${inT + r(150)}" x2="${inR}" y2="${inT + r(150)}" stroke="white" stroke-width="${r(1.5)}" opacity="0.22"/>
+    <line x1="${inL}" y1="${inT + r(200)}" x2="${inR}" y2="${inT + r(200)}" stroke="white" stroke-width="${r(1.5)}" opacity="0.2"/>
+    <line x1="${inL}" y1="${inT + r(250)}" x2="${inR}" y2="${inT + r(250)}" stroke="white" stroke-width="${r(1.5)}" opacity="0.18"/>
+    <line x1="${inL}" y1="${inT + r(300)}" x2="${inR}" y2="${inT + r(300)}" stroke="white" stroke-width="${r(1.5)}" opacity="0.15"/>
+    <line x1="${inL}" y1="${inT + r(350)}" x2="${inR}" y2="${inT + r(350)}" stroke="white" stroke-width="${r(1.5)}" opacity="0.12"/>
 
     <!-- Vertical grid lines -->
-    <line x1="${cx - r(30)}" y1="${cy - r(130)}" x2="${cx - r(34)}" y2="${cy - r(50)}" stroke="white" stroke-width="${r(1.2)}" opacity="0.3"/>
-    <line x1="${cx}" y1="${cy - r(138)}" x2="${cx}" y2="${cy - r(50)}" stroke="white" stroke-width="${r(1.2)}" opacity="0.35"/>
-    <line x1="${cx + r(30)}" y1="${cy - r(130)}" x2="${cx + r(34)}" y2="${cy - r(50)}" stroke="white" stroke-width="${r(1.2)}" opacity="0.3"/>
+    <line x1="${inL + r(80)}" y1="${inT}" x2="${inL + r(80)}" y2="${inB}" stroke="white" stroke-width="${r(1.5)}" opacity="0.25"/>
+    <line x1="${inL + r(180)}" y1="${inT}" x2="${inL + r(180)}" y2="${inB}" stroke="white" stroke-width="${r(1.5)}" opacity="0.25"/>
+    <line x1="${inL + r(280)}" y1="${inT}" x2="${inL + r(280)}" y2="${inB}" stroke="white" stroke-width="${r(1.5)}" opacity="0.25"/>
+    <line x1="${inL + r(380)}" y1="${inT}" x2="${inL + r(380)}" y2="${inB}" stroke="white" stroke-width="${r(1.5)}" opacity="0.2"/>
 
-    <!-- Cell values woven into turban -->
-    <text x="${cx - r(16)}" y="${cy - r(95)}" font-family="monospace" font-size="${r(13)}" fill="white" opacity="0.5" text-anchor="middle">A1</text>
-    <text x="${cx + r(16)}" y="${cy - r(95)}" font-family="monospace" font-size="${r(13)}" fill="white" opacity="0.5" text-anchor="middle">B2</text>
-    <text x="${cx - r(16)}" y="${cy - r(76)}" font-family="monospace" font-size="${r(12)}" fill="white" opacity="0.4" text-anchor="middle">$</text>
-    <text x="${cx + r(16)}" y="${cy - r(76)}" font-family="monospace" font-size="${r(12)}" fill="white" opacity="0.4" text-anchor="middle">42</text>
+    <!-- Column header bar (darker green strip at top) -->
+    <rect x="${inL}" y="${inT}" width="${inW}" height="${r(50)}" fill="#145C2E" rx="0"/>
 
-    <!-- Turban jewel/pin centered on forehead band -->
-    <circle cx="${cx}" cy="${cy - r(44)}" r="${r(10)}" fill="#0D5C2A"/>
-    <circle cx="${cx}" cy="${cy - r(44)}" r="${r(7)}" fill="#4ADE80"/>
-    <circle cx="${cx - r(2)}" cy="${cy - r(47)}" r="${r(2.5)}" fill="white" opacity="0.85"/>
+    <!-- Column headers A, B, C, D -->
+    <text x="${inL + r(130)}" y="${inT + r(35)}" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="${r(26)}" fill="white" opacity="0.9" text-anchor="middle">A</text>
+    <text x="${inL + r(230)}" y="${inT + r(35)}" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="${r(26)}" fill="white" opacity="0.9" text-anchor="middle">B</text>
+    <text x="${inL + r(330)}" y="${inT + r(35)}" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-size="${r(26)}" fill="white" opacity="0.9" text-anchor="middle">C</text>
+
+    <!-- Row numbers along left edge -->
+    <text x="${inL + r(40)}" y="${inT + r(82)}" font-family="Arial,Helvetica,sans-serif" font-size="${r(20)}" fill="white" opacity="0.6" text-anchor="middle">1</text>
+    <text x="${inL + r(40)}" y="${inT + r(132)}" font-family="Arial,Helvetica,sans-serif" font-size="${r(20)}" fill="white" opacity="0.6" text-anchor="middle">2</text>
+    <text x="${inL + r(40)}" y="${inT + r(182)}" font-family="Arial,Helvetica,sans-serif" font-size="${r(20)}" fill="white" opacity="0.5" text-anchor="middle">3</text>
+
+    <!-- === BAR CHART rising behind the character === -->
+    <!-- Bar 1 (blue) -->
+    <rect x="${cx - r(100)}" y="${cy - r(110)}" width="${r(40)}" height="${r(130)}" rx="${r(4)}" fill="#4F8EF7" opacity="0.85"/>
+    <!-- Bar 2 (purple, tallest) -->
+    <rect x="${cx - r(50)}" y="${cy - r(155)}" width="${r(40)}" height="${r(175)}" rx="${r(4)}" fill="#7C3AED" opacity="0.85"/>
+    <!-- Bar 3 (amber) -->
+    <rect x="${cx}" y="${cy - r(125)}" width="${r(40)}" height="${r(145)}" rx="${r(4)}" fill="#F59E0B" opacity="0.85"/>
+    <!-- Bar 4 (blue, short) -->
+    <rect x="${cx + r(50)}" y="${cy - r(80)}" width="${r(40)}" height="${r(100)}" rx="${r(4)}" fill="#4F8EF7" opacity="0.7"/>
+
+    <!-- === BODY / SHOULDERS === -->
+    <ellipse cx="${cx}" cy="${r(510)}" rx="${r(120)}" ry="${r(80)}" fill="#1E3A5F"/>
+
+    <!-- Neck -->
+    <rect x="${cx - r(28)}" y="${cy + r(58)}" width="${r(56)}" height="${r(36)}" rx="${r(8)}" fill="url(#skin)"/>
+
+    <!-- === FACE === -->
+    <ellipse cx="${cx}" cy="${cy}" rx="${r(60)}" ry="${r(70)}" fill="url(#skin)"/>
+
+    <!-- Eyes -->
+    <ellipse cx="${cx - r(22)}" cy="${cy - r(6)}" rx="${r(10)}" ry="${r(10)}" fill="white"/>
+    <ellipse cx="${cx + r(22)}" cy="${cy - r(6)}" rx="${r(10)}" ry="${r(10)}" fill="white"/>
+    <circle cx="${cx - r(20)}" cy="${cy - r(4)}" r="${r(5.5)}" fill="#2D1810"/>
+    <circle cx="${cx + r(24)}" cy="${cy - r(4)}" r="${r(5.5)}" fill="#2D1810"/>
+    <circle cx="${cx - r(19)}" cy="${cy - r(6)}" r="${r(1.8)}" fill="white" opacity="0.9"/>
+    <circle cx="${cx + r(25)}" cy="${cy - r(6)}" r="${r(1.8)}" fill="white" opacity="0.9"/>
+
+    <!-- Eyebrows -->
+    <path d="M${cx - r(34)},${cy - r(20)} Q${cx - r(22)},${cy - r(28)} ${cx - r(10)},${cy - r(20)}" stroke="#2D1810" stroke-width="${r(4)}" fill="none" stroke-linecap="round"/>
+    <path d="M${cx + r(10)},${cy - r(20)} Q${cx + r(22)},${cy - r(28)} ${cx + r(34)},${cy - r(20)}" stroke="#2D1810" stroke-width="${r(4)}" fill="none" stroke-linecap="round"/>
+
+    <!-- Nose -->
+    <path d="M${cx},${cy} L${cx + r(6)},${cy + r(18)}" stroke="#A0673A" stroke-width="${r(2.5)}" fill="none" stroke-linecap="round"/>
+
+    <!-- Mustache -->
+    <path d="M${cx - r(24)},${cy + r(26)} Q${cx},${cy + r(34)} ${cx + r(24)},${cy + r(26)}" fill="#1A0E06"/>
+
+    <!-- Smile -->
+    <path d="M${cx - r(18)},${cy + r(36)} Q${cx},${cy + r(48)} ${cx + r(18)},${cy + r(36)}" stroke="#8B4020" stroke-width="${r(2.5)}" fill="none" stroke-linecap="round"/>
+
+    <!-- Ears -->
+    <ellipse cx="${cx - r(60)}" cy="${cy + r(2)}" rx="${r(10)}" ry="${r(14)}" fill="#C07844"/>
+    <ellipse cx="${cx + r(60)}" cy="${cy + r(2)}" rx="${r(10)}" ry="${r(14)}" fill="#C07844"/>
+
+    <!-- === WHITE TURBAN (tall pagri) === -->
+
+    <!-- Main turban dome — tall and peaked -->
+    <path d="M${cx - r(78)},${cy - r(30)}
+             Q${cx - r(85)},${cy - r(100)} ${cx - r(50)},${cy - r(150)}
+             Q${cx - r(20)},${cy - r(185)} ${cx},${cy - r(190)}
+             Q${cx + r(20)},${cy - r(185)} ${cx + r(50)},${cy - r(150)}
+             Q${cx + r(85)},${cy - r(100)} ${cx + r(78)},${cy - r(30)}
+             Z" fill="url(#turbanW)"/>
+
+    <!-- Turban wrap folds (horizontal bands) -->
+    <path d="M${cx - r(72)},${cy - r(50)} Q${cx},${cy - r(65)} ${cx + r(72)},${cy - r(50)}" stroke="#C0C0C0" stroke-width="${r(2)}" fill="none" opacity="0.6"/>
+    <path d="M${cx - r(78)},${cy - r(75)} Q${cx},${cy - r(92)} ${cx + r(78)},${cy - r(75)}" stroke="#B8B8B8" stroke-width="${r(2.5)}" fill="none" opacity="0.5"/>
+    <path d="M${cx - r(74)},${cy - r(100)} Q${cx},${cy - r(118)} ${cx + r(74)},${cy - r(100)}" stroke="#C0C0C0" stroke-width="${r(2)}" fill="none" opacity="0.5"/>
+    <path d="M${cx - r(60)},${cy - r(130)} Q${cx},${cy - r(148)} ${cx + r(60)},${cy - r(130)}" stroke="#B0B0B0" stroke-width="${r(2)}" fill="none" opacity="0.4"/>
+    <path d="M${cx - r(38)},${cy - r(158)} Q${cx},${cy - r(172)} ${cx + r(38)},${cy - r(158)}" stroke="#C8C8C8" stroke-width="${r(1.5)}" fill="none" opacity="0.35"/>
+
+    <!-- Turban forehead band (prominent lower edge) -->
+    <path d="M${cx - r(78)},${cy - r(30)} Q${cx},${cy - r(46)} ${cx + r(78)},${cy - r(30)}" stroke="#D8D8D8" stroke-width="${r(12)}" fill="none" stroke-linecap="round"/>
+    <path d="M${cx - r(74)},${cy - r(30)} Q${cx},${cy - r(44)} ${cx + r(74)},${cy - r(30)}" stroke="white" stroke-width="${r(6)}" fill="none" stroke-linecap="round"/>
+
+    <!-- Turban side tails (fabric draping down on sides) -->
+    <path d="M${cx - r(72)},${cy - r(36)} Q${cx - r(82)},${cy - r(10)} ${cx - r(70)},${cy + r(10)}" stroke="url(#turbanW)" stroke-width="${r(14)}" fill="none" stroke-linecap="round"/>
+    <path d="M${cx + r(72)},${cy - r(36)} Q${cx + r(82)},${cy - r(10)} ${cx + r(70)},${cy + r(10)}" stroke="url(#turbanW)" stroke-width="${r(14)}" fill="none" stroke-linecap="round"/>
+
+    <!-- Turban jewel (small gold/amber accent) -->
+    <circle cx="${cx}" cy="${cy - r(36)}" r="${r(8)}" fill="#B45309"/>
+    <circle cx="${cx}" cy="${cy - r(36)}" r="${r(5.5)}" fill="#F59E0B"/>
+    <circle cx="${cx - r(1.5)}" cy="${cy - r(38.5)}" r="${r(2)}" fill="white" opacity="0.8"/>
 
   </g>
 </svg>`;
