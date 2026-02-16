@@ -52,7 +52,7 @@ export default function InstallPrompt() {
   if (!deferredPrompt && !showIOSPrompt) return null;
 
   return (
-    <div className="fixed bottom-[72px] left-1/2 -translate-x-1/2 w-[92%] max-w-[440px] z-[100] animate-slide-up">
+    <div className="mx-auto w-[92%] max-w-[440px] mb-4 animate-slide-up">
       <div className="bg-snap-surface border border-snap-border rounded-2xl p-4 shadow-xl shadow-black/30">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-snap-accent to-purple-600 flex items-center justify-center text-lg shrink-0">

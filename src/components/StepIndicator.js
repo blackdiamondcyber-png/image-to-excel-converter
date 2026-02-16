@@ -11,11 +11,11 @@ export default function StepIndicator({ current }) {
   const currentIndex = STEPS.findIndex((s) => s.key === current);
 
   return (
-    <div className="flex justify-center gap-1 pt-4 pb-2 px-3 overflow-x-auto scrollbar-none">
+    <div className="flex justify-center gap-0.5 pt-4 pb-2 px-2 overflow-x-auto scrollbar-none">
       {STEPS.map((s, i) => (
-        <div key={s.key} className="flex items-center gap-1 shrink-0">
+        <div key={s.key} className="flex items-center gap-0.5 shrink-0">
           <div
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full border transition-all duration-300 ${
+            className={`flex items-center gap-1 px-2 py-1.5 rounded-full border transition-all duration-300 ${
               i === currentIndex
                 ? "bg-snap-accent-glow border-snap-accent"
                 : i < currentIndex
@@ -23,9 +23,9 @@ export default function StepIndicator({ current }) {
                   : "bg-transparent border-snap-border"
             }`}
           >
-            <span className="text-[13px]">{s.icon}</span>
+            <span className="text-xs">{s.icon}</span>
             <span
-              className={`text-[10px] hidden min-[360px]:inline ${
+              className={`text-[10px] hidden min-[380px]:inline ${
                 i === currentIndex
                   ? "font-semibold text-snap-accent"
                   : i < currentIndex
@@ -38,7 +38,7 @@ export default function StepIndicator({ current }) {
           </div>
           {i < STEPS.length - 1 && (
             <div
-              className={`w-3 h-px ${
+              className={`w-2 h-px ${
                 i < currentIndex ? "bg-snap-success" : "bg-snap-border"
               }`}
             />
