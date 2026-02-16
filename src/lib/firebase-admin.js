@@ -34,7 +34,10 @@ function ensureInitialized() {
 
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+  const rawKey = process.env.FIREBASE_PRIVATE_KEY;
+  const privateKey = parsePrivateKey(rawKey);
+
+  console.log("ADMIN DEBUG: projectId present:", !!projectId, "clientEmail present:", !!clientEmail, "rawKey present:", !!rawKey, "rawKey length:", rawKey?.length, "privateKey starts with BEGIN:", privateKey?.startsWith("-----BEGIN"));
 
   const missing = [];
   if (!projectId) missing.push("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
@@ -53,6 +56,7 @@ function ensureInitialized() {
     });
     _adminAuth = getAuth(_adminApp);
     _adminDb = getFirestore(_adminApp);
+    console.log("ADMIN DEBUG: Firebase Admin initialized successfully");
   } catch (err) {
     _initError = err.message;
     console.error("Firebase Admin init failed:", err.message);
