@@ -43,7 +43,7 @@ Auth gate → CaptureStep → ProcessingStep → ReviewStep → ExportStep
 
 - **Extraction:** Client compresses image (1024px max, JPEG 0.7) → sends base64 + Firebase ID token to `/api/extract` → server verifies auth, checks rate limit, calls Claude Haiku → returns `{ tables, remaining }`
 - **Storage:** All scan history is saved to **localStorage** on the device (key: `"rohan_scans"`). No Firestore reads/writes for scans.
-- **Export:** Excel generated client-side via SheetJS (`/src/lib/excel.js`). Multiple export paths: direct download, Save As dialog, cloud drive share, native share.
+- **Export:** Excel generated client-side via SheetJS (`/src/lib/excel.js`). Export paths: `downloadExcel` (direct `<a>` download), `saveExcelAs` (File System Access API with download fallback), cloud saves via `/src/lib/cloud-save.js` (Web Share API on mobile, download + open cloud service on desktop), native share (`navigator.share`).
 
 ### Server/Client Boundary
 
@@ -60,7 +60,7 @@ Client-only (components/hooks):
 ## Critical Rules
 
 1. **`CLAUDE_API_KEY` and Firebase Admin credentials are SERVER-ONLY** — only use in `/src/app/api/` routes, never import `claude.js` or `firebase-admin.js` from client components
-2. **The extraction prompt in `/src/lib/claude.js` is the most critical code** — it must return clean JSON with rows padded to match header count. Changes here affect all downstream processing.
+2. **The extraction prompt in `/src/lib/claude.js` is the most critical code** — it must return clean JSON with rows padded to match header count. The prompt includes strict transcription fidelity rules to prevent phantom punctuation (added dots, periods, slashes). When modifying the prompt, always preserve the "CRITICAL — Transcription fidelity" section.
 3. **Dark theme only** — use the `snap-*` Tailwind color palette from `tailwind.config.js`. Never use hardcoded colors outside this palette.
 4. **Mobile-first** — all touch targets 44×44px minimum. Use `min-h-[100dvh]` (not `min-h-screen`) for proper mobile viewport. Use `overscroll-behavior-y: contain` to prevent pull-to-refresh. Test on iOS Safari + Android Chrome.
 5. **Cost control** — Model is `claude-haiku-4-5-20251001` (cheapest). Images are compressed client-side. Rate limits: 50 extractions/user/day, 500 global/day. Don't switch to a more expensive model without discussing cost.
@@ -91,3 +91,5 @@ FIREBASE_PRIVATE_KEY                       # Server-only — Firebase Admin
 - **EditableTable** allows inline cell editing, add/delete rows and columns. State flows up through `setTables` callback to `ReviewStep` → `SnapSheetApp`.
 - **Export API** sanitizes all table data (title, headers, cells) with length limits before generating Excel. Max: 100 tables, 10K rows/table, 100 columns.
 - **localStorage validation** in `useScans.js` filters out malformed entries and rejects prototype pollution attempts via `Object.prototype.hasOwnProperty.call(scan, "__proto__")`.
+- **Cloud save pattern** (`/src/lib/cloud-save.js`): All three cloud buttons (Drive, OneDrive, Dropbox) share the same pattern — try `navigator.share()` first (works on mobile), fall back to blob download + open cloud URL. `URL.revokeObjectURL` is delayed 5s for mobile compatibility. The "Share to Other Apps" button is conditionally rendered via `canShareFiles()` check.
+- **`next build` kills the running dev server** — always restart `npm run dev` after building.
