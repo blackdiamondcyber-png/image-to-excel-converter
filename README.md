@@ -2,7 +2,7 @@
 
 The oldest project on this account and the only repo here with a full commit history (February to March 2026). Photograph a document, up to 40 pages, and get a clean Excel file back on your phone.
 
-Claude Vision does the extraction, which makes this one of the two places in anything I have built where a model actually runs. Everything I run in production for field teams is deterministic.
+Claude Vision does the extraction. This is one of three capture tools where a model actually runs, alongside a product barcode scanner and a parts catalog lookup. Everything I run in production for field teams is deterministic.
 
 ## What it does
 
