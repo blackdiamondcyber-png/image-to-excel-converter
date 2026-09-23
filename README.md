@@ -2,7 +2,9 @@
 
 The oldest project on this account and the only repo here with a full commit history (February to March 2026). Photograph a document, up to 40 pages, and get a clean Excel file back on your phone.
 
-Claude Vision does the extraction. This is one of three capture tools where a model actually runs, alongside a product barcode scanner and a parts catalog lookup. Everything I run in production for field teams is deterministic.
+Claude Vision does the extraction. This is one of three capture tools where a model actually runs, alongside a product barcode scanner and a parts catalog lookup. Everything else I run in production for field teams is deterministic, including the three territory apps.
+
+Inside the app it is branded Rohan, and the npm package is named `snapsheet`; the repo name says what it does.
 
 ## What it does
 
