@@ -61,7 +61,7 @@ export async function extractTablesFromImage(base64Data, mediaType) {
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(
-      err.error?.message || `Anthropic API error: ${response.status}`
+      err.error?.message || `Anthropic API error: ${response.status}`,
     );
   }
 
@@ -72,6 +72,17 @@ export async function extractTablesFromImage(base64Data, mediaType) {
     .map((item) => item.text)
     .join("\n");
 
+  return parseTablesFromResponseText(text);
+}
+
+/**
+ * Pure parse-and-repair step, split out of extractTablesFromImage so it can
+ * be unit tested without a network call. Takes the raw text Claude returned
+ * (markdown fences and stray prose included) and returns the same
+ * normalized tables array extractTablesFromImage used to return inline, or
+ * throws the same errors it used to throw.
+ */
+export function parseTablesFromResponseText(text) {
   // Strip markdown fences and extract the JSON object from any surrounding text
   let cleaned = text.replace(/```json|```/g, "").trim();
   const jsonStart = cleaned.indexOf("{");
@@ -92,7 +103,13 @@ export async function extractTablesFromImage(base64Data, mediaType) {
   }
 
   return parsed.tables
-    .filter((t) => Array.isArray(t.headers) && t.headers.length > 0 && Array.isArray(t.rows) && t.rows.length > 0)
+    .filter(
+      (t) =>
+        Array.isArray(t.headers) &&
+        t.headers.length > 0 &&
+        Array.isArray(t.rows) &&
+        t.rows.length > 0,
+    )
     .map((t) => ({
       title: t.title || "Extracted Table",
       headers: t.headers.map(String),

@@ -10,7 +10,7 @@ Claude Vision does the extraction. This is one of three capture tools where a mo
 - Capture, process, review, export: one step at a time
 - Each page is compressed client-side, sent through a server route to Claude Vision, and comes back as JSON tables. The prompt enforces exact transcription, no duplicate rows, and row lengths that match the header count
 - Review and edit the tables in place before export
-- Excel is generated client-side with SheetJS; export by direct download, File System Access API, Web Share on mobile, or cloud save
+- Excel is generated client-side with SheetJS; export by direct download, File System Access API where supported, Web Share on mobile, or hand off to Google Drive, OneDrive or Dropbox through the phone's share sheet (desktop downloads the file, then opens the drive's website to finish the upload)
 - Scan history lives in localStorage on the device; nothing is stored server-side
 - Firebase auth with server-side token verification, plus per-user and global daily rate limits to cap API spend
 
@@ -31,3 +31,5 @@ npm run dev
 ## Status
 
 Beta. Built for field reps who get handed paper price lists and order forms and need them in a spreadsheet before they leave the parking lot.
+
+More of my work: [erik-pearson-portfolio.vercel.app](https://erik-pearson-portfolio.vercel.app). Contact: [LinkedIn](https://www.linkedin.com/in/erikpearson2).

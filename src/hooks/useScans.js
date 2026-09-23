@@ -6,8 +6,11 @@ const STORAGE_KEY = "rohan_scans";
 
 /**
  * Read scans from localStorage with validation.
+ * Exported (alongside writeToStorage) so the guards below — prototype
+ * pollution filtering and quota-exceeded handling — can be unit tested
+ * without going through the useScans hook or a real browser.
  */
-function readFromStorage() {
+export function readFromStorage() {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -20,7 +23,7 @@ function readFromStorage() {
         scan &&
         typeof scan === "object" &&
         typeof scan.id === "string" &&
-        !Object.prototype.hasOwnProperty.call(scan, "__proto__") // Reject prototype pollution
+        !Object.prototype.hasOwnProperty.call(scan, "__proto__"), // Reject prototype pollution
     );
   } catch {
     return [];
@@ -30,7 +33,7 @@ function readFromStorage() {
 /**
  * Write scans to localStorage.
  */
-function writeToStorage(scans) {
+export function writeToStorage(scans) {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(scans));
