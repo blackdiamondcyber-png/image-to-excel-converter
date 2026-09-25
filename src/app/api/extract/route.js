@@ -164,7 +164,8 @@ export async function POST(request) {
       );
     }
 
-    if (!process.env.CLAUDE_API_KEY) {
+    // Vercel holds the key as ANTHROPIC_API_KEY; CLAUDE_API_KEY still works locally.
+    if (!process.env.ANTHROPIC_API_KEY && !process.env.CLAUDE_API_KEY) {
       return NextResponse.json(
         { error: "API key is not configured. Contact the administrator." },
         { status: 500 }

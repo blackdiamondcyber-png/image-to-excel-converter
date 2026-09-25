@@ -63,14 +63,14 @@ Client-only (components/hooks):
 2. **The extraction prompt in `/src/lib/claude.js` is the most critical code** — it must return clean JSON with rows padded to match header count. The prompt uses a structured 3-step process (identify structure → extract every row → verify) with anti-duplication and exact-transcription rules. When modifying the prompt, preserve the step structure, the uniqueness constraint in Step 3, and the row-count verification.
 3. **Dark theme only** — use the `snap-*` Tailwind color palette from `tailwind.config.js`. Never use hardcoded colors outside this palette.
 4. **Mobile-first** — all touch targets 44×44px minimum. Use `min-h-[100dvh]` (not `min-h-screen`) for proper mobile viewport. Use `overscroll-behavior-y: contain` to prevent pull-to-refresh. Test on iOS Safari + Android Chrome.
-5. **Cost control** — Model is `claude-sonnet-4-20250514` (upgraded from Haiku for accuracy). ~$0.09/extraction. Images compressed client-side (1568px max, PNG). Rate limits: 50 extractions/user/day, 500 global/day. ~$4.30/day max at full usage.
+5. **Cost control** — Model is `claude-sonnet-5` (was `claude-sonnet-4-20250514`, retired 15 Jun 2026; Sonnet 5 rejects `temperature`, so none is sent). ~$0.09/extraction. Images compressed client-side (1568px max, PNG). Rate limits: 50 extractions/user/day, 500 global/day. ~$4.30/day max at full usage.
 6. **Auth required everywhere** — Both `SnapSheetApp` and `HistoryPage` redirect to `/login` if unauthenticated. The extract API verifies Firebase ID tokens server-side.
 7. **All hooks must be called before early returns** — Several components have auth-gate early returns; all `useState`/`useCallback`/custom hooks must be declared above these to satisfy React's rules of hooks.
 
 ## Env Vars Required
 
 ```
-CLAUDE_API_KEY                             # Server-only — Claude API
+CLAUDE_API_KEY                             # Server-only — Claude API (Vercel names it ANTHROPIC_API_KEY; either works)
 NEXT_PUBLIC_FIREBASE_API_KEY               # Client — Firebase public config
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
 NEXT_PUBLIC_FIREBASE_PROJECT_ID

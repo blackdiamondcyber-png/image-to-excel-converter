@@ -28,13 +28,15 @@ export async function extractTablesFromImage(base64Data, mediaType) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.CLAUDE_API_KEY,
+      "x-api-key": process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY,
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 8192,
-      temperature: 0,
+      // claude-sonnet-4-20250514 was retired 15 Jun 2026 (404). Sonnet 5 rejects a
+      // non-default temperature with a 400, so temperature: 0 had to go, and it
+      // thinks by default (thinking counts toward max_tokens), hence the headroom.
+      model: "claude-sonnet-5",
+      max_tokens: 16000,
       system: SYSTEM_MESSAGE,
       messages: [
         {
