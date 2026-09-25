@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { parseTablesFromResponseText } from "../src/lib/claude.js";
+import {
+  assertCompleteResponse,
+  ExtractionError,
+  parseTablesFromResponseText,
+} from "../src/lib/claude.js";
 
 // This exercises only the parse-and-repair step pulled out of
 // extractTablesFromImage. No network call happens anywhere here: every
@@ -146,5 +150,20 @@ describe("parseTablesFromResponseText", () => {
     });
     const result = parseTablesFromResponseText(text);
     expect(result[0].rows[0]).toEqual(["", ""]);
+  });
+});
+
+describe("assertCompleteResponse", () => {
+  it("accepts a finished reply", () => {
+    expect(() => assertCompleteResponse({ stop_reason: "end_turn" })).not.toThrow();
+  });
+
+  it("names a reply cut off at max_tokens", () => {
+    expect(() => assertCompleteResponse({ stop_reason: "max_tokens" })).toThrow(/too large/);
+    expect(() => assertCompleteResponse({ stop_reason: "max_tokens" })).toThrow(ExtractionError);
+  });
+
+  it("names a refused reply", () => {
+    expect(() => assertCompleteResponse({ stop_reason: "refusal" })).toThrow(/could not be processed/);
   });
 });

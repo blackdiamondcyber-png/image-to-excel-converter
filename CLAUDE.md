@@ -83,7 +83,7 @@ FIREBASE_PRIVATE_KEY                       # Server-only — Firebase Admin
 
 ## Deployment (Vercel)
 
-- Deployed to **Vercel** from branch `claude/build-phase-1-4ZlxJ` (currently treated as Production).
+- 🚨 Vercel's Production branch is still set to `claude/build-phase-1-4ZlxJ`, which was DELETED, so a push to `main` builds a Preview only. Production runs `main` because a session created the production deployment through the API (25 Sep 2026). Until Erik sets Settings > Environments > Production > Branch to `main`, every release needs that API step (or `vercel --prod`).
 - **`NEXT_PUBLIC_*` vars are inlined at build time** — if you add/change them on Vercel, you must trigger a redeploy for the client bundle to pick up the new values. Server-only vars (`CLAUDE_API_KEY`, `FIREBASE_*`) take effect immediately on cold starts.
 - **Vercel env var pitfalls**: When setting env vars via `vercel env add`, ensure values have NO trailing `\n`. The Vercel CLI can silently append newlines when piping values, which breaks Firebase Auth (e.g., `"image-to-excel-5cfd5\n"` causes audience mismatch). Use `--sensitive` for `FIREBASE_PRIVATE_KEY`.
 - **`FIREBASE_PRIVATE_KEY` format**: On Vercel it should have real newlines (not `\\n` escape sequences). The `parsePrivateKey()` function in `firebase-admin.js` handles both formats. When uploading via CLI, pipe from a file to preserve newlines.
@@ -110,6 +110,6 @@ FIREBASE_PRIVATE_KEY                       # Server-only — Firebase Admin
 ## Vercel Deployment Notes
 
 - **Fluid Compute** is enabled via `vercel.json` (`"fluid": true`). This gives the Hobby plan up to 300s function timeout.
-- The extract route has `maxDuration = 60` for Sonnet's longer response times.
+- The extract route has `maxDuration = 300` (the Hobby maximum with fluid compute): Sonnet 5 thinks before it answers. A reply cut off at `max_tokens` or refused (`stop_reason: "refusal"`) throws `ExtractionError`, whose message the route returns with a 422 instead of the generic 500.
 - Production env vars were fixed (trailing `\n` issue from `echo` piping — use `printf '%s'` instead).
 - Both `/api/extract` and `/api/export` have REST auth fallback, so they work even if Firebase Admin SDK fails to initialize.

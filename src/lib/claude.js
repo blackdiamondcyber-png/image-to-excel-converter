@@ -68,6 +68,7 @@ export async function extractTablesFromImage(base64Data, mediaType) {
   }
 
   const data = await response.json();
+  assertCompleteResponse(data);
 
   const text = data.content
     .filter((item) => item.type === "text")
@@ -75,6 +76,26 @@ export async function extractTablesFromImage(base64Data, mediaType) {
     .join("\n");
 
   return parseTablesFromResponseText(text);
+}
+
+/** An extraction failure whose message is safe to show the user. */
+export class ExtractionError extends Error {}
+
+/**
+ * Claude Sonnet 5 thinks before it answers, so a large table can use up
+ * max_tokens before the JSON is finished, and a reply can be declined
+ * (stop_reason "refusal"). Both used to surface as "Failed to extract data...
+ * Please try again", which invites a retry that fails the same way.
+ */
+export function assertCompleteResponse(data) {
+  if (data?.stop_reason === "max_tokens") {
+    throw new ExtractionError(
+      "This table is too large to read in one pass. Try a photo with fewer rows.",
+    );
+  }
+  if (data?.stop_reason === "refusal") {
+    throw new ExtractionError("This image could not be processed. Try a different photo.");
+  }
 }
 
 /**

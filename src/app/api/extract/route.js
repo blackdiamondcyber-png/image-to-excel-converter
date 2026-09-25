@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { extractTablesFromImage } from "@/lib/claude";
+import { ExtractionError, extractTablesFromImage } from "@/lib/claude";
 import { checkAndRecordExtraction } from "@/lib/rate-limit";
 import { getAdminAuth } from "@/lib/firebase-admin";
 
-// Extend Vercel serverless function timeout for Sonnet model responses
-export const maxDuration = 60;
+// Sonnet 5 thinks before it answers, so a large table can outrun the old 60 s;
+// 300 s is the Hobby maximum with fluid compute (vercel.json).
+export const maxDuration = 300;
 
 const ALLOWED_MEDIA_TYPES = [
   "image/jpeg",
@@ -178,7 +179,10 @@ export async function POST(request) {
       tables,
       remaining: limit.remaining,
     });
-  } catch {
+  } catch (err) {
+    if (err instanceof ExtractionError) {
+      return NextResponse.json({ error: err.message }, { status: 422 });
+    }
     return NextResponse.json(
       { error: "Failed to extract data from image. Please try again." },
       { status: 500 }
