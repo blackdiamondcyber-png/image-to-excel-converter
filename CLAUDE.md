@@ -41,7 +41,7 @@ Auth gate → CaptureStep → ProcessingStep → ReviewStep → ExportStep
 
 ### Data Flow
 
-- **Extraction:** Client compresses image (1568px max, PNG with JPEG 0.92 fallback) → sends base64 + Firebase ID token to `/api/extract` → server verifies auth, checks rate limit, calls Claude Sonnet 4 → returns `{ tables, remaining }`
+- **Extraction:** Client compresses image (1568px max, PNG with JPEG 0.92 fallback) → sends base64 + Firebase ID token to `/api/extract` → server verifies auth, checks rate limit, calls Claude Sonnet 5 → returns `{ tables, remaining }`
 - **Storage:** All scan history is saved to **localStorage** on the device (key: `"rohan_scans"`). No Firestore reads/writes for scans.
 - **Export:** Excel generated client-side via SheetJS (`/src/lib/excel.js`). Export paths: `downloadExcel` (direct `<a>` download), `saveExcelAs` (File System Access API with download fallback), cloud saves via `/src/lib/cloud-save.js` (Web Share API on mobile, download + open cloud service on desktop), native share (`navigator.share`).
 
